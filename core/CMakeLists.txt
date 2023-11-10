@@ -4,6 +4,7 @@ set(ENGINE_PROJECT_NAME Waza3DCore)
 
 set(ENGINE_PUBLIC_INCLUDES
 	includes/application.hpp
+	includes/logs.hpp
 )
 
 set(ENGINE_PRIVATE_SOURCES

@@ -1,13 +1,15 @@
 #include "application.hpp"
+#include "logs.hpp"
 
 #include <GLFW/glfw3.h>
 
-//#include <iostream>
-
-namespace waza3d{
+namespace waza3d {
 	Application::Application()
 	{
-
+        LOG_INFO("Info log!");
+        LOG_ERROR("Some error message");
+        LOG_WARNING("Warning message");
+        LOG_CRITICAL("Critical message");
 	}
 
 	Application::~Application()

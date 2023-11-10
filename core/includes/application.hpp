@@ -1,8 +1,8 @@
 #pragma once
 
-namespace waza3d{
+namespace waza3d {
 
-	/* Для использовния класса нужно переопределить функцию void on_update()
+	/* Р”Р»СЏ РёСЃРїРѕР»СЊР·РѕРІРЅРёСЏ РєР»Р°СЃСЃР° РЅСѓР¶РЅРѕ РїРµСЂРµРѕРїСЂРµРґРµР»РёС‚СЊ С„СѓРЅРєС†РёСЋ void on_update()
 	*/
 
 	class Application 
@@ -12,7 +12,7 @@ namespace waza3d{
 		virtual ~Application();
 
 
-		//Класс должен быть в одном экземпляре и не может копироваться
+		//В РљР»Р°СЃСЃ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІ РѕРґРЅРѕРј СЌРєР·РµРјРїР»СЏСЂРµ Рё РЅРµ РјРѕР¶РµС‚ РєРѕРїРёСЂРѕРІР°С‚СЊСЃСЏ
 		Application(const Application&) = delete;
 		Application(Application&&) = delete;
 		Application& operator=(const Application&) = delete;
