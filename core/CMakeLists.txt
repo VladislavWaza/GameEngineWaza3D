@@ -2,9 +2,18 @@ cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
 
 set(ENGINE_PROJECT_NAME Waza3DCore)
 
+set(ENGINE_PUBLIC_INCLUDES
+	includes/application.hpp
+)
+
+set(ENGINE_PRIVATE_SOURCES
+	src/application.cpp
+)
+
+
 add_library(${ENGINE_PROJECT_NAME} STATIC 
-	src/test.cpp
-	includes/test.hpp
+	${ENGINE_PUBLIC_INCLUDES}
+	${ENGINE_PRIVATE_SOURCES}
 )
 
 target_include_directories(${ENGINE_PROJECT_NAME} PUBLIC includes)
