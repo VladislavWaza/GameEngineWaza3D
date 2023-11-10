@@ -2,9 +2,7 @@
 
 namespace waza3d {
 
-	/* Для использовния класса нужно переопределить функцию void on_update()
-	*/
-
+	/* Для использовния класса нужно переопределить функцию void on_update()*/
 	class Application 
 	{
 	public:
