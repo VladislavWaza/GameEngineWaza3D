@@ -18,20 +18,46 @@ namespace waza3d {
 	{
 		m_window = std::make_unique<Window>(width, height, title);
 
-		/*Задаем функцию обработки ивента извне*/
-		m_window->setEventCallback(
-			[](Event& event)
+		/*Задаем функцию обработки ивента перемещения мыши извне*/
+		m_event_dispatcher.addEventListener<EventMouseMoved>(
+			[](EventMouseMoved& event)
 			{
-				LOG_INFO("[EVENT] Changed size to {0}x{1}", event.m_width, event.m_height);
+				LOG_INFO("[MouseMoved] Mouse moved to {0}x{1}", event.m_x, event.m_y);
 			}
 		);
 
-		while (true)
+		/*Задаем функцию обработки ивента изменения размера окна извне*/
+		m_event_dispatcher.addEventListener<EventWindowResize>(
+			[](EventWindowResize& event)
+			{
+				LOG_INFO("[WindowResize] Changed size to {0}x{1}", event.m_width, event.m_height);
+			}
+		);
+
+		/*Задаем функцию обработки ивента закрытия окна извне*/
+		m_event_dispatcher.addEventListener<EventWindowClose>(
+			[&](EventWindowClose& e)
+			{
+				LOG_INFO("[WindowClose]");
+				m_close_window = true;
+			}
+		);
+
+		/*Эта лямбда будет вызываться каждый раз когда происходит какой-либо ивент*/
+		m_window->setEventCallback(
+			[&](BaseEvent& event)
+			{
+				m_event_dispatcher.dispatch(event);
+			}
+		);
+
+
+		while (!m_close_window)
 		{
 			m_window->onUpdate(); 
 			onUpdate();
 		}
-
+		m_window = nullptr;
         return 0;
 	}
 

@@ -11,7 +11,7 @@ namespace waza3d {
 	class Window
 	{
 	public:
-		using EventCallbackFun = std::function<void(Event&)>;
+		using EventCallbackFun = std::function<void(BaseEvent&)>;
 
 		Window(unsigned int width, unsigned int height, const std::string& title);
 		~Window();

@@ -89,12 +89,38 @@ namespace waza3d {
                 data.m_height = height;
 
                 /*Вызываем функцию-обработчик заданную извне*/
-                Event event;
-                event.m_width = width;
-                event.m_height = height;
+                EventWindowResize event(width, height);
                 data.m_event_callback_fun(event);
             }
         );
+
+        /*Эта лямбда-функция будет вызываться каждый раз когда происходит встроенное в GLFW событие изменения положение мыши*/
+        glfwSetCursorPosCallback(m_window,
+            [](GLFWwindow* window, double x, double y)
+            {
+                /*Позиция курсора относительно верхнего левого края*/
+
+                /*Получаем ссылку на пользовательские данные m_data из GLFW окна m_window*/
+                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+
+                /*Вызываем функцию-обработчик заданную извне*/
+                EventMouseMoved event(x,y);
+                data.m_event_callback_fun(event);
+            }
+        );
+
+        /*Эта лямбда-функция будет вызываться каждый раз когда происходит встроенное в GLFW событие закрытия окна*/
+        glfwSetWindowCloseCallback(m_window, 
+            [](GLFWwindow* window)
+            {
+                /*Получаем ссылку на пользовательские данные m_data из GLFW окна m_window*/
+                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+
+                EventWindowClose event;
+                data.m_event_callback_fun(event);
+            }
+        );
+
 
         return 0;  
 	}

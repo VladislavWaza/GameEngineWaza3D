@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
 
+#include "event.hpp"
+
 namespace waza3d {
 
 	/* Для использовния класса нужно переопределить функцию void onUpdate(), которая циклично вызывается*/
@@ -22,5 +24,8 @@ namespace waza3d {
 	
 	private:
 		std::unique_ptr<class Window> m_window;
+
+		EventDispatcher m_event_dispatcher;
+		bool m_close_window = false;
 	};
 }
