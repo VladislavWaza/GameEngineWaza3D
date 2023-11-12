@@ -18,10 +18,18 @@ namespace waza3d {
 	{
 		m_window = std::make_unique<Window>(width, height, title);
 
+		/*Задаем функцию обработки ивента извне*/
+		m_window->setEventCallback(
+			[](Event& event)
+			{
+				LOG_INFO("[EVENT] Changed size to {0}x{1}", event.m_width, event.m_height);
+			}
+		);
+
 		while (true)
 		{
-			m_window->on_update(); 
-			on_update();
+			m_window->onUpdate(); 
+			onUpdate();
 		}
 
         return 0;

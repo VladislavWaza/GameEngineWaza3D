@@ -6,9 +6,9 @@ class Editor : public waza3d::Application
 {
 	int frame = 0;
 public:
-	virtual void on_update() override
+	virtual void onUpdate() override
 	{
-		std::cout << "Frame: " << frame++ << std::endl;
+		//std::cout << "Frame: " << frame++ << std::endl;
 	}
 };
 

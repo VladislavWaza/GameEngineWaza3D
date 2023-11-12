@@ -3,7 +3,7 @@
 
 namespace waza3d {
 
-	/* Для использовния класса нужно переопределить функцию void on_update()*/
+	/* Для использовния класса нужно переопределить функцию void onUpdate(), которая циклично вызывается*/
 	class Application 
 	{
 	public:
@@ -18,7 +18,7 @@ namespace waza3d {
 
 		virtual int start(unsigned int width, unsigned int height, const char* title);
 
-		virtual void on_update() {};
+		virtual void onUpdate() {};
 	
 	private:
 		std::unique_ptr<class Window> m_window;

@@ -7,7 +7,7 @@
 namespace waza3d {
 
 	Window::Window(unsigned int width, unsigned int height, const std::string& title)
-		:m_width(width), m_height(height), m_title(title)
+        :m_data({ width, height, title })
 	{
 		init();
 	}
@@ -17,7 +17,7 @@ namespace waza3d {
 		shutdown();
 	}
 
-	void Window::on_update()
+	void Window::onUpdate()
 	{
         glClearColor(1, 0, 0, 0);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -27,17 +27,22 @@ namespace waza3d {
 
 	unsigned int Window::width() const
 	{
-		return m_width;
+		return m_data.m_width;
 	}
 
 	unsigned int Window::height() const
 	{
-		return m_height;
+		return m_data.m_height;
 	}
+
+    void Window::setEventCallback(const EventCallbackFun& callback)
+    {
+        m_data.m_event_callback_fun = callback;
+    }
 
 	int Window::init()
 	{
-        LOG_INFO("Creating window '{0}' with size {1}x{2}", m_title, m_width, m_height);
+        LOG_INFO("Creating window '{0}' with size {1}x{2}", m_data.m_title, m_data.m_width, m_data.m_height);
 
         /* Initialize the library */
         if (!s_GLFW_initialized)
@@ -51,10 +56,10 @@ namespace waza3d {
         }
 
         /* Create a windowed mode window and its OpenGL context */
-        m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
+        m_window = glfwCreateWindow(m_data.m_width, m_data.m_height, m_data.m_title.c_str(), nullptr, nullptr);
         if (!m_window)
         {
-            LOG_CRITICAL("Can't create window '{0}'!", m_title);
+            LOG_CRITICAL("Can't create window '{0}'!", m_data.m_title);
             glfwTerminate();
             return -1;
         }
@@ -68,6 +73,28 @@ namespace waza3d {
             LOG_CRITICAL("Failed to initialize GLAD");
             return -1;
         }
+
+        /*Кладем пользовательские данные m_data в GLFW окно m_window*/
+        glfwSetWindowUserPointer(m_window, &m_data);
+
+        /*Эта лямбда-функция будет вызываться каждый раз когда происходит встроенное в GLFW изменение размеров окна*/
+        glfwSetWindowSizeCallback(m_window, 
+            [](GLFWwindow* window, int width, int height)
+            {
+                /*Получаем ссылку на пользовательские данные m_data из GLFW окна m_window*/
+                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+                
+                /*Запоминем новые размеры окна*/
+                data.m_width = width;
+                data.m_height = height;
+
+                /*Вызываем функцию-обработчик заданную извне*/
+                Event event;
+                event.m_width = width;
+                event.m_height = height;
+                data.m_event_callback_fun(event);
+            }
+        );
 
         return 0;  
 	}
