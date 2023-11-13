@@ -3,13 +3,20 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+
 
 namespace waza3d {
 
 	Window::Window(unsigned int width, unsigned int height, const std::string& title)
         :m_data({ width, height, title })
 	{
-		init();
+		int resCode = init();
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui_ImplOpenGL3_Init();
 	}
 
 	Window::~Window()
@@ -19,8 +26,25 @@ namespace waza3d {
 
 	void Window::onUpdate()
 	{
+        /*Чистим окно*/
         glClearColor(1, 0, 0, 0);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        /*Получаем хендл*/
+        ImGuiIO& io = ImGui::GetIO();
+        /*Задаем размеры*/
+        io.DisplaySize.x = static_cast<float>(m_data.m_width);
+        io.DisplaySize.y = static_cast<float>(m_data.m_height);
+        /*Начинаем новый кадр*/
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui::NewFrame();
+        /*Рисуем демо окно*/
+        ImGui::ShowDemoWindow();
+        /*Реденерим*/
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
         glfwSwapBuffers(m_window);
         glfwPollEvents();
 	}
