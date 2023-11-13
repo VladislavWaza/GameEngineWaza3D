@@ -5,13 +5,35 @@
 #include "GLFW/glfw3.h"
 
 namespace waza3d {
-    bool ShaderProgram::createShader(const char* shader_src, const ShaderType shader_type, GLuint& shader_id)
+
+    constexpr bool shaderType_to_GLenum(const ShaderProgram::ShaderType shader_type, GLenum& gl_shader_type)
     {
-        GLenum gl_shader_type;
-        if (shader_type == ShaderType::Fragment)
+        switch (shader_type)
+        {
+        case ShaderProgram::ShaderType::Fragment:
+        {
             gl_shader_type = GL_FRAGMENT_SHADER;
-        if (shader_type == ShaderType::Vertex)
+            return true;
+        }
+        case ShaderProgram::ShaderType::Vertex:
+        {
             gl_shader_type = GL_VERTEX_SHADER;
+            return true;
+        }
+        }
+        LOG_CRITICAL("Unknown ShaderType usage");
+        return false;
+    }
+
+
+    bool ShaderProgram::createShader(const char* shader_src, const ShaderType shader_type, unsigned int& shader_id)
+    {
+        /*Преобразуем перечеснение ShaderProgram::ShaderType в тип GLenum*/
+        GLenum gl_shader_type = 0;
+        if (!shaderType_to_GLenum(shader_type, gl_shader_type))
+        {
+            return false;
+        }
 
         /*Генерируем идентификатор шейдера*/
         shader_id = glCreateShader(gl_shader_type);
@@ -33,7 +55,6 @@ namespace waza3d {
         }
         return true;
     }
-
 
     ShaderProgram::ShaderProgram(const char* vertex_shader_src, const char* fragment_shader_src)
 	{
