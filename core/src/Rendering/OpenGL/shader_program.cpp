@@ -1,13 +1,20 @@
 #include "shader_program.hpp"
 #include "logs.hpp"
 
+#include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
 namespace waza3d {
-    bool ShaderProgram::createShader(const char* shader_src, const GLenum shader_type, GLuint& shader_id)
+    bool ShaderProgram::createShader(const char* shader_src, const ShaderType shader_type, GLuint& shader_id)
     {
+        GLenum gl_shader_type;
+        if (shader_type == ShaderType::Fragment)
+            gl_shader_type = GL_FRAGMENT_SHADER;
+        if (shader_type == ShaderType::Vertex)
+            gl_shader_type = GL_VERTEX_SHADER;
+
         /*Генерируем идентификатор шейдера*/
-        shader_id = glCreateShader(shader_type);
+        shader_id = glCreateShader(gl_shader_type);
         /*Задаем код шейдера и компилируем*/
         glShaderSource(shader_id, 1, &shader_src, nullptr);
         glCompileShader(shader_id);
@@ -32,14 +39,14 @@ namespace waza3d {
 	{
         /*Создаем шейдеры*/
         GLuint vertex_shader_id = 0;
-        if (!createShader(vertex_shader_src, GL_VERTEX_SHADER, vertex_shader_id))
+        if (!createShader(vertex_shader_src, ShaderType::Vertex, vertex_shader_id))
         {
             LOG_CRITICAL("Vertex shader compilation error");
             glDeleteShader(vertex_shader_id);
             return;
         }
         GLuint fragment_shader_id = 0;
-        if (!createShader(fragment_shader_src, GL_FRAGMENT_SHADER, fragment_shader_id))
+        if (!createShader(fragment_shader_src, ShaderType::Fragment, fragment_shader_id))
         {
             LOG_CRITICAL("Fragment shader compilation error");
             glDeleteShader(vertex_shader_id);

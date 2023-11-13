@@ -57,7 +57,7 @@ namespace waza3d {
 		/*Укалатель на программу с шейдерами*/
 		std::unique_ptr<ShaderProgram> m_shader_program;
 		/*Идентификатор VertexArrayObject, который хранит все состояния, необходимые для предоставления данных о вершинах*/
-		GLuint m_vao;
+		unsigned int m_vao;
 
 	};
 }
