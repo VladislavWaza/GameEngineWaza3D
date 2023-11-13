@@ -111,7 +111,7 @@ namespace waza3d {
         return m_isCompiled;
     }
 
-    void ShaderProgram::bind()
+    void ShaderProgram::bind() const
     {
         glUseProgram(m_id);
     }

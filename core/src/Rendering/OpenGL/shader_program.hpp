@@ -20,7 +20,7 @@ namespace waza3d {
         ShaderProgram& operator=(const ShaderProgram&) = delete;
 
         bool isCompiled();
-        void bind();
+        void bind() const;
         static void unbind();
     };
 
