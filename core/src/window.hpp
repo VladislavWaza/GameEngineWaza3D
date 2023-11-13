@@ -4,6 +4,7 @@
 
 #include "event.hpp"
 #include "Rendering/OpenGL/shader_program.hpp"
+#include "Rendering/OpenGL/vertex_buffer.hpp"
 
 struct GLFWwindow;
 
@@ -56,6 +57,10 @@ namespace waza3d {
 		
 		/*Укалатель на программу с шейдерами*/
 		std::unique_ptr<ShaderProgram> m_shader_program;
+		/*Указатели на буферы*/
+		std::unique_ptr<VertexBuffer> m_points_vb;
+		std::unique_ptr<VertexBuffer> m_colors_vb;
+
 		/*Идентификатор VertexArrayObject, который хранит все состояния, необходимые для предоставления данных о вершинах*/
 		unsigned int m_vao;
 

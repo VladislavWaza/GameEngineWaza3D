@@ -2,11 +2,10 @@
 #include "logs.hpp"
 
 #include "glad/glad.h"
-#include "GLFW/glfw3.h"
 
 namespace waza3d {
 
-    constexpr bool shaderType_to_GLenum(const ShaderProgram::ShaderType shader_type, GLenum& gl_shader_type)
+    constexpr bool shaderTypeToGLenum(const ShaderProgram::ShaderType shader_type, GLenum& gl_shader_type)
     {
         switch (shader_type)
         {
@@ -30,7 +29,7 @@ namespace waza3d {
     {
         /*Преобразуем перечеснение ShaderProgram::ShaderType в тип GLenum*/
         GLenum gl_shader_type = 0;
-        if (!shaderType_to_GLenum(shader_type, gl_shader_type))
+        if (!shaderTypeToGLenum(shader_type, gl_shader_type))
         {
             return false;
         }

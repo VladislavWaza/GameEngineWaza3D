@@ -214,20 +214,10 @@ namespace waza3d {
         }
 
         /*Генерируем буфер для передачи данных в видеокарту*/
-        GLuint points_vbo = 0;
-        glGenBuffers(1, &points_vbo);
+        m_points_vb = std::make_unique<VertexBuffer>(points, sizeof(points), VertexBuffer::UsageType::Static);
+        m_colors_vb = std::make_unique<VertexBuffer>(colors, sizeof(colors), VertexBuffer::UsageType::Static);
 
-        /*Подключаем буфер и назначаем текущим*/
-        glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-
-        /*Отправлем данные в видеопамять и обозначаес что наши данные не будут меняться*/
-        glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
-
-        /*Повторяем все вышеописанное для буфера цвета*/
-        GLuint colors_vbo = 0;
-        glGenBuffers(1, &colors_vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+        
 
         /*Генерируем и назначаем текущим VertexArrayObject*/
         glGenVertexArrays(1, &m_vao);
@@ -237,13 +227,14 @@ namespace waza3d {
         для этого сначала активируем позицию*/
         glEnableVertexAttribArray(0);
         /*Сделаем нужный буфер активным*/
-        glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-        /*Связываем параметры: позиция, число вертексов, тип, нужно ли нормализовать, шаг смещения, смещение начала*/
+        m_points_vb->bind();
+        /*Связываем и указываем лейаут 
+        с параметрами: позиция, число вертексов, тип, нужно ли нормализовать, шаг смещения, смещение начала*/
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
         /*Повторяем связывание для буфера цвета*/
         glEnableVertexAttribArray(1);
-        glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
+        m_colors_vb->bind();
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
         return 0;  
