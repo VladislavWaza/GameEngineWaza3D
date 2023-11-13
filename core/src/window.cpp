@@ -41,10 +41,6 @@ namespace waza3d {
         "   frag_color = vec4(color, 1.0);"
         "}";
 
-    GLuint shader_program;
-    GLuint vao;
-
-
 	Window::Window(unsigned int width, unsigned int height, const std::string& title)
         :m_data({ width, height, title })
 	{
@@ -72,8 +68,8 @@ namespace waza3d {
         glClear(GL_COLOR_BUFFER_BIT);
 
         /*Подключаем программу шейдеров и VertexArrayObject*/
-        glUseProgram(shader_program);
-        glBindVertexArray(vao);
+        m_shader_program->bind();
+        glBindVertexArray(m_vao);
         /*Отрисовываем, выбираем тип, смещение и число вертексов*/
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -209,28 +205,13 @@ namespace waza3d {
             }
         );
 
-        /*Генерируем идентификатор вертексного шейдера*/
-        GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-        /*Задаем код шейдера и компилируем*/
-        glShaderSource(vs, 1, &vertex_shader, nullptr);
-        glCompileShader(vs);
-
-        /*Генерируем идентификатор фрагментного шейдера*/
-        GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-        /*Задаем код шейдера и компилируем*/
-        glShaderSource(fs, 1, &fragment_shader, nullptr);
-        glCompileShader(fs);
-
-        /*Генерируем идентификатор шейдерной программы*/
-        shader_program = glCreateProgram();
-        /*Линкуем у ней шейдеры*/
-        glAttachShader(shader_program, vs);
-        glAttachShader(shader_program, fs);
-        glLinkProgram(shader_program);
-
-        /*После создания программы шейдеры не нужны, удаляем их*/
-        glDeleteShader(vs);
-        glDeleteShader(fs);
+        /*Создаем шейдерную программу*/
+        m_shader_program = std::make_unique<ShaderProgram>(vertex_shader, fragment_shader);
+        if (!m_shader_program->isCompiled())
+        {
+            LOG_CRITICAL("Failed to compile shader program");
+            return -1;
+        }
 
         /*Генерируем буфер для передачи данных в видеокарту*/
         GLuint points_vbo = 0;
@@ -249,8 +230,8 @@ namespace waza3d {
         glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
 
         /*Генерируем и назначаем текущим VertexArrayObject*/
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
+        glGenVertexArrays(1, &m_vao);
+        glBindVertexArray(m_vao);
 
         /*Связываем буферы с позицией в коде куда они пойдут в шейдеры
         для этого сначала активируем позицию*/

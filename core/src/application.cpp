@@ -22,7 +22,7 @@ namespace waza3d {
 		m_event_dispatcher.addEventListener<EventMouseMoved>(
 			[](EventMouseMoved& event)
 			{
-				LOG_INFO("[MouseMoved] Mouse moved to {0}x{1}", event.m_x, event.m_y);
+				//LOG_INFO("[MouseMoved] Mouse moved to {0}x{1}", event.m_x, event.m_y);
 			}
 		);
 

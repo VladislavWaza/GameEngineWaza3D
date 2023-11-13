@@ -3,6 +3,7 @@
 #include <functional>
 
 #include "event.hpp"
+#include "Rendering/OpenGL/shader_program.hpp"
 
 struct GLFWwindow;
 
@@ -34,17 +35,29 @@ namespace waza3d {
 
 		struct WindowData
 		{
+			/*Размеры окна*/
 			unsigned int m_width = 0;
 			unsigned int m_height = 0;
+			/*Заголовок окна*/
 			std::string m_title;
 			/*функция обработки ивента*/
 			EventCallbackFun m_event_callback_fun; 
 
 		};
-
+		/*Хендл окна GLFW*/
 		GLFWwindow* m_window = nullptr;
-		static inline bool s_GLFW_initialized = false;
+		/*Структура с размерами, заголовком и функцией обработки*/
 		WindowData m_data;
-		float m_background_color[4] = {1.f, 0.f, 0.f, 0.f};
+		/*Фоновый цвет в формате RGBA*/
+		float m_background_color[4] = { 0.7f, 0.7f, 0.7f, 0.f };
+
+		/*Проиницализована ли библиотека GLFW*/
+		static inline bool s_GLFW_initialized = false;
+		
+		/*Укалатель на программу с шейдерами*/
+		std::unique_ptr<ShaderProgram> m_shader_program;
+		/*Идентификатор VertexArrayObject, который хранит все состояния, необходимые для предоставления данных о вершинах*/
+		GLuint m_vao;
+
 	};
 }
