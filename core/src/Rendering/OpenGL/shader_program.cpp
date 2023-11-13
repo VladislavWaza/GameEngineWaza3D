@@ -6,18 +6,18 @@
 namespace waza3d {
     bool ShaderProgram::createShader(const char* shader_src, const GLenum shader_type, GLuint& shader_id)
     {
-        /*Генерируем идентификатор шейдера*/
+        /*Р“РµРЅРµСЂРёСЂСѓРµРј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С€РµР№РґРµСЂР°*/
         shader_id = glCreateShader(shader_type);
-        /*Задаем код шейдера и компилируем*/
+        /*Р—Р°РґР°РµРј РєРѕРґ С€РµР№РґРµСЂР° Рё РєРѕРјРїРёР»РёСЂСѓРµРј*/
         glShaderSource(shader_id, 1, &shader_src, nullptr);
         glCompileShader(shader_id);
 
-        /*Проверяем корректность компиляции*/
+        /*РџСЂРѕРІРµСЂСЏРµРј РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ РєРѕРјРїРёР»СЏС†РёРё*/
         GLint success;
         glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
         if (success == GL_FALSE)
         {
-            /*Выдаем ошибку компиляции*/
+            /*Р’С‹РґР°РµРј РѕС€РёР±РєСѓ РєРѕРјРїРёР»СЏС†РёРё*/
             char info_log[1024];
             glGetShaderInfoLog(shader_id, 1024, nullptr, info_log);
 
@@ -30,7 +30,7 @@ namespace waza3d {
 
     ShaderProgram::ShaderProgram(const char* vertex_shader_src, const char* fragment_shader_src)
 	{
-        /*Создаем шейдеры*/
+        /*РЎРѕР·РґР°РµРј С€РµР№РґРµСЂС‹*/
         GLuint vertex_shader_id = 0;
         if (!createShader(vertex_shader_src, GL_VERTEX_SHADER, vertex_shader_id))
         {
@@ -47,14 +47,14 @@ namespace waza3d {
             return;
         }
         
-        /*Генерируем идентификатор шейдерной программы*/
+        /*Р“РµРЅРµСЂРёСЂСѓРµРј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С€РµР№РґРµСЂРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹*/
         m_id = glCreateProgram();
-        /*Линкуем к ней шейдеры*/
+        /*Р›РёРЅРєСѓРµРј Рє РЅРµР№ С€РµР№РґРµСЂС‹*/
         glAttachShader(m_id, vertex_shader_id);
         glAttachShader(m_id, fragment_shader_id);
         glLinkProgram(m_id);
 
-        /*Проверяем корректность линковки*/
+        /*РџСЂРѕРІРµСЂСЏРµРј РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ Р»РёРЅРєРѕРІРєРё*/
         GLint success;
         glGetProgramiv(m_id, GL_LINK_STATUS, &success);
         if (success == GL_FALSE)
@@ -73,7 +73,7 @@ namespace waza3d {
             m_isCompiled = true;
         }
 
-        /*Шейдеры больше не нужны, удаляем*/
+        /*РЁРµР№РґРµСЂС‹ Р±РѕР»СЊС€Рµ РЅРµ РЅСѓР¶РЅС‹, СѓРґР°Р»СЏРµРј*/
         glDetachShader(m_id, vertex_shader_id);
         glDetachShader(m_id, fragment_shader_id);
         glDeleteShader(vertex_shader_id);
