@@ -2,13 +2,13 @@
 #include <string>
 #include <functional>
 
-#include "event.hpp"
-#include "Rendering/OpenGL/shader_program.hpp"
-#include "Rendering/OpenGL/vertex_buffer.hpp"
-
 struct GLFWwindow;
 
 namespace waza3d {
+	struct BaseEvent;
+	class ShaderProgram;
+	class VertexBuffer;
+	class VertexArray;
 
 	class Window
 	{
@@ -61,8 +61,8 @@ namespace waza3d {
 		std::unique_ptr<VertexBuffer> m_points_vb;
 		std::unique_ptr<VertexBuffer> m_colors_vb;
 
-		/*Идентификатор VertexArrayObject, который хранит все состояния, необходимые для предоставления данных о вершинах*/
-		unsigned int m_vao;
+		/*Указатель на VertexArray, который хранит все состояния, необходимые для предоставления данных о вершинах*/
+		std::unique_ptr<VertexArray> m_vertex_array;
 
 	};
 }

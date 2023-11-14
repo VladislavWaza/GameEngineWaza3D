@@ -1,5 +1,9 @@
 #include "window.hpp"
 #include "logs.hpp"
+#include "event.hpp"
+#include "Rendering/OpenGL/shader_program.hpp"
+#include "Rendering/OpenGL/vertex_buffer.hpp"
+#include "Rendering/OpenGL/vertex_array.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -67,9 +71,9 @@ namespace waza3d {
         glClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        /*Подключаем программу шейдеров и VertexArrayObject*/
+        /*Подключаем программу шейдеров и VertexArray*/
         m_shader_program->bind();
-        glBindVertexArray(m_vao);
+        m_vertex_array->bind();
         /*Отрисовываем, выбираем тип, смещение и число вертексов*/
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -217,25 +221,12 @@ namespace waza3d {
         m_points_vb = std::make_unique<VertexBuffer>(points, sizeof(points), VertexBuffer::UsageType::Static);
         m_colors_vb = std::make_unique<VertexBuffer>(colors, sizeof(colors), VertexBuffer::UsageType::Static);
 
-        
+        /*Генерируем и назначаем текущим VertexArray*/
+        m_vertex_array = std::make_unique<VertexArray>();
 
-        /*Генерируем и назначаем текущим VertexArrayObject*/
-        glGenVertexArrays(1, &m_vao);
-        glBindVertexArray(m_vao);
-
-        /*Связываем буферы с позицией в коде куда они пойдут в шейдеры
-        для этого сначала активируем позицию*/
-        glEnableVertexAttribArray(0);
-        /*Сделаем нужный буфер активным*/
-        m_points_vb->bind();
-        /*Связываем и указываем лейаут 
-        с параметрами: позиция, число вертексов, тип, нужно ли нормализовать, шаг смещения, смещение начала*/
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-        /*Повторяем связывание для буфера цвета*/
-        glEnableVertexAttribArray(1);
-        m_colors_vb->bind();
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        /*Связываем буферы c массивом*/
+        m_vertex_array->addBuffer(*m_points_vb);
+        m_vertex_array->addBuffer(*m_colors_vb);
 
         return 0;  
 	}
