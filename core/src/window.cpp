@@ -26,6 +26,13 @@ namespace waza3d {
         0.0f, 0.0f, 1.0f
     };
 
+    GLfloat points_colors[] = {
+        0.5f, 0.5f, 0.0f,       0.7f, 0.0f, 0.3f,
+        0.4f, -0.25f, 0.0f,     0.3f, 0.7f, 0.0f,
+        -0.5f, -0.5f, 0.0f,     0.0f, 0.3f, 0.7f
+    };
+
+
     /*Код шейдеров на языке GLSL*/
     const char* vertex_shader =
         "#version 460\n"
@@ -71,12 +78,6 @@ namespace waza3d {
         glClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        /*Подключаем программу шейдеров и VertexArray*/
-        m_shader_program->bind();
-        m_vertex_array->bind();
-        /*Отрисовываем, выбираем тип, смещение и число вертексов*/
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
         /*Получаем хендл*/
         ImGuiIO& io = ImGui::GetIO();
         /*Задаем размеры*/
@@ -92,6 +93,27 @@ namespace waza3d {
 
         ImGui::Begin("Background color window");
         ImGui::ColorEdit4("Background color", m_background_color);
+
+        static bool use_2_buffers = true;
+        ImGui::Checkbox("Use 2 buffers", &use_2_buffers);
+        if (use_2_buffers)
+        {
+            /*Подключаем программу шейдеров и VertexArray*/
+            m_shader_program->bind();
+            m_vertex_array->bind();
+            /*Отрисовываем, выбираем тип, смещение и число вертексов*/
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        }
+        else
+        {
+            /*Подключаем программу шейдеров и VertexArray*/
+            m_shader_program->bind();
+            m_points_colors_va->bind();
+            /*Отрисовываем, выбираем тип, смещение и число вертексов*/
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        }
+
+
         ImGui::End();
 
         /*Реденерим*/
@@ -217,9 +239,12 @@ namespace waza3d {
             return -1;
         }
 
+        /*Создаем Layout для двух буферов, которые состоят из vec3*/
+        BufferLayout buffer_layout_vec3{ShaderDataType::Float3};
+
         /*Генерируем буфер для передачи данных в видеокарту*/
-        m_points_vb = std::make_unique<VertexBuffer>(points, sizeof(points), VertexBuffer::UsageType::Static);
-        m_colors_vb = std::make_unique<VertexBuffer>(colors, sizeof(colors), VertexBuffer::UsageType::Static);
+        m_points_vb = std::make_unique<VertexBuffer>(points, sizeof(points), buffer_layout_vec3, VertexBuffer::UsageType::Static);
+        m_colors_vb = std::make_unique<VertexBuffer>(colors, sizeof(colors), buffer_layout_vec3, VertexBuffer::UsageType::Static);
 
         /*Генерируем и назначаем текущим VertexArray*/
         m_vertex_array = std::make_unique<VertexArray>();
@@ -227,6 +252,12 @@ namespace waza3d {
         /*Связываем буферы c массивом*/
         m_vertex_array->addBuffer(*m_points_vb);
         m_vertex_array->addBuffer(*m_colors_vb);
+
+        /*Проделаем все тоже самое для буфера в котором друг за другом идет позиция и цвет*/
+        BufferLayout buffer_layout_2vec3{ ShaderDataType::Float3, ShaderDataType::Float3 };
+        m_points_colors_vb = std::make_unique<VertexBuffer>(points_colors, sizeof(points_colors), buffer_layout_2vec3, VertexBuffer::UsageType::Static);
+        m_points_colors_va = std::make_unique<VertexArray>();
+        m_points_colors_va->addBuffer(*m_points_colors_vb);
 
         return 0;  
 	}

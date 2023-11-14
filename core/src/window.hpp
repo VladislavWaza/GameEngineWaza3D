@@ -64,5 +64,7 @@ namespace waza3d {
 		/*Указатель на VertexArray, который хранит все состояния, необходимые для предоставления данных о вершинах*/
 		std::unique_ptr<VertexArray> m_vertex_array;
 
+		std::unique_ptr<VertexBuffer> m_points_colors_vb;
+		std::unique_ptr<VertexArray> m_points_colors_va;
 	};
 }

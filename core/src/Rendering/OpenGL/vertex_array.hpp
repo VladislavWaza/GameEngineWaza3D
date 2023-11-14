@@ -2,7 +2,7 @@
 namespace waza3d {
 	class VertexBuffer;
 
-	/*Класс нужен чтобы связать VertexBuffer с входными атрибутами в коде шейдера и задать layout*/
+	/*РљР»Р°СЃСЃ РЅСѓР¶РµРЅ С‡С‚РѕР±С‹ СЃРІСЏР·Р°С‚СЊ VertexBuffer СЃ РІС…РѕРґРЅС‹РјРё Р°С‚СЂРёР±СѓС‚Р°РјРё РІ РєРѕРґРµ С€РµР№РґРµСЂР° Рё Р·Р°РґР°С‚СЊ layout*/
 	class VertexArray {
 		unsigned int m_id = 0;
 		unsigned int m_elem_count = 0;
@@ -16,7 +16,7 @@ namespace waza3d {
 		VertexArray(const VertexArray&) = delete;
 		VertexArray& operator=(const VertexArray&) = delete;
 
-		/*Назначает текущими буфер и массив и добавляет буфер*/
+		/*РќР°Р·РЅР°С‡Р°РµС‚ С‚РµРєСѓС‰РёРјРё Р±СѓС„РµСЂ Рё РјР°СЃСЃРёРІ Рё РґРѕР±Р°РІР»СЏРµС‚ Р±СѓС„РµСЂ*/
 		void addBuffer(const VertexBuffer& vertex_buffer);
 		void bind() const;
 		static void unbind();

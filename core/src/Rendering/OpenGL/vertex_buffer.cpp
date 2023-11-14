@@ -4,6 +4,7 @@
 #include "glad/glad.h"
 
 namespace waza3d {
+
     constexpr GLenum usageTypeToGLenum(const VertexBuffer::UsageType usage_type)
     {
         switch (usage_type)
@@ -17,7 +18,8 @@ namespace waza3d {
     }
 
 
-    VertexBuffer::VertexBuffer(const void* data, const size_t size, const UsageType usage)
+    VertexBuffer::VertexBuffer(const void* data, const size_t size, BufferLayout layout, const UsageType usage)
+        :m_layout(std::move(layout))
     {
         /*Генерируем буфер для передачи данных в видеокарту*/
         glGenBuffers(1, &m_id);
@@ -28,6 +30,7 @@ namespace waza3d {
     }
 
     VertexBuffer::VertexBuffer(VertexBuffer&& other) noexcept
+        :m_layout(std::move(other.m_layout))
     {
         m_id = other.m_id;
         other.m_id = 0;
@@ -35,6 +38,7 @@ namespace waza3d {
 
     VertexBuffer& VertexBuffer::operator=(VertexBuffer&& other) noexcept
     {
+        m_layout = std::move(other.m_layout);
         m_id = other.m_id;
         other.m_id = 0;
         return *this;
@@ -55,4 +59,8 @@ namespace waza3d {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
+    const BufferLayout& VertexBuffer::getLayout() const
+    {
+        return m_layout;
+    }
 }

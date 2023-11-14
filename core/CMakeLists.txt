@@ -21,6 +21,7 @@ set(ENGINE_PRIVATE_SOURCES
 	src/Rendering/OpenGL/shader_program.cpp
 	src/Rendering/OpenGL/vertex_buffer.cpp
 	src/Rendering/OpenGL/vertex_array.cpp
+	src/Rendering/OpenGL/buffer_layout.cpp
 )
 
 set(ENGINE_ALL_SOURCES

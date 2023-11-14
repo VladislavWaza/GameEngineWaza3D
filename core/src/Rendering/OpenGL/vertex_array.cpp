@@ -8,7 +8,7 @@ namespace waza3d {
 
 	VertexArray::VertexArray()
 	{
-		/*Генерируем VertexArrayObject*/
+		/*Р“РµРЅРµСЂРёСЂСѓРµРј VertexArrayObject*/
 		glGenVertexArrays(1, &m_id);
 	}
 
@@ -36,18 +36,26 @@ namespace waza3d {
 
 	void VertexArray::addBuffer(const VertexBuffer& vertex_buffer)
 	{
-		/*Назначаем буфер и массив активными*/
+		/*РќР°Р·РЅР°С‡Р°РµРј Р±СѓС„РµСЂ Рё РјР°СЃСЃРёРІ Р°РєС‚РёРІРЅС‹РјРё*/
 		bind();
 		vertex_buffer.bind();
 
-		/*Связываем буфер с позицией в коде куда он пойдет в шейдер
-		для этого сначала активируем позицию*/
-		glEnableVertexAttribArray(m_elem_count);
-		/*Связываем и указываем лейаут
-	    с параметрами: позиция, число вертексов, тип, нужно ли нормализовать, шаг смещения, смещение начала*/
-		glVertexAttribPointer(m_elem_count, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-		++m_elem_count;
+		for (const BufferElement& cur_elem : vertex_buffer.getLayout().getElems())
+		{
+			/*РЎРІСЏР·С‹РІР°РµРј Р±СѓС„РµСЂ СЃ РїРѕР·РёС†РёРµР№ РІ РєРѕРґРµ РєСѓРґР° РѕРЅ РїРѕР№РґРµС‚ РІ С€РµР№РґРµСЂ
+			РґР»СЏ СЌС‚РѕРіРѕ СЃРЅР°С‡Р°Р»Р° Р°РєС‚РёРІРёСЂСѓРµРј РїРѕР·РёС†РёСЋ*/
+			glEnableVertexAttribArray(m_elem_count);
+			/*РЎРІСЏР·С‹РІР°РµРј Рё СѓРєР°Р·С‹РІР°РµРј Р»РµР№Р°СѓС‚
+			СЃ РїР°СЂР°РјРµС‚СЂР°РјРё: РїРѕР·РёС†РёСЏ, С‡РёСЃР»Рѕ РІРµСЂС‚РµРєСЃРѕРІ, С‚РёРї, РЅСѓР¶РЅРѕ Р»Рё РЅРѕСЂРјР°Р»РёР·РѕРІР°С‚СЊ, С€Р°Рі СЃРјРµС‰РµРЅРёСЏ, СЃРјРµС‰РµРЅРёРµ РЅР°С‡Р°Р»Р°*/
+			glVertexAttribPointer(
+				m_elem_count, 
+				static_cast<GLint>(cur_elem.components_count), 
+				static_cast<GLenum>(cur_elem.component_type), 
+				GL_FALSE,
+				static_cast<GLsizei>(vertex_buffer.getLayout().getStride()), 
+				reinterpret_cast<const void*>(cur_elem.offset));
+			++m_elem_count;
+		}
 	}
 
 	void VertexArray::bind() const
