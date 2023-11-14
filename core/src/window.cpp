@@ -4,6 +4,7 @@
 #include "Rendering/OpenGL/shader_program.hpp"
 #include "Rendering/OpenGL/vertex_buffer.hpp"
 #include "Rendering/OpenGL/vertex_array.hpp"
+#include "Rendering/OpenGL/index_buffer.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -14,24 +15,17 @@
 
 namespace waza3d {
 
-    GLfloat points[] = {
-        0.5f, 0.5f, 0.0f,
-        0.4f, -0.25f, 0.0f,
-        -0.5f, -0.5f, 0.0f
-    };
-    
-    GLfloat colors[] = {
-        1.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f
+
+    GLfloat points_colors_for_index_buf[] = {
+        0.4f, -0.25f, 0.0f,     0.3f, 0.75f, 0.63f,
+        0.5f, 0.5f, 0.0f,       0.7f, 0.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 0.5f,
+        -0.4f, 0.25f, 0.0f,     0.6f, 0.0f, 0.6f,
     };
 
-    GLfloat points_colors[] = {
-        0.5f, 0.5f, 0.0f,       0.7f, 0.0f, 0.3f,
-        0.4f, -0.25f, 0.0f,     0.3f, 0.7f, 0.0f,
-        -0.5f, -0.5f, 0.0f,     0.0f, 0.3f, 0.7f
+    GLuint indexes[] = {
+        0, 1, 2, 3, 2, 1
     };
-
 
     /*Код шейдеров на языке GLSL*/
     const char* vertex_shader =
@@ -94,27 +88,13 @@ namespace waza3d {
         ImGui::Begin("Background color window");
         ImGui::ColorEdit4("Background color", m_background_color);
 
-        static bool use_2_buffers = true;
-        ImGui::Checkbox("Use 2 buffers", &use_2_buffers);
-        if (use_2_buffers)
-        {
-            /*Подключаем программу шейдеров и VertexArray*/
-            m_shader_program->bind();
-            m_vertex_array->bind();
-            /*Отрисовываем, выбираем тип, смещение и число вертексов*/
-            glDrawArrays(GL_TRIANGLES, 0, 3);
-        }
-        else
-        {
-            /*Подключаем программу шейдеров и VertexArray*/
-            m_shader_program->bind();
-            m_points_colors_va->bind();
-            /*Отрисовываем, выбираем тип, смещение и число вертексов*/
-            glDrawArrays(GL_TRIANGLES, 0, 3);
-        }
-
-
         ImGui::End();
+
+        /*Подключаем программу шейдеров и VertexArray*/
+        m_shader_program->bind();
+        m_points_colors_va->bind();
+        /*Отрисовываем, выбираем тип, число вертексов, тип, указатель на индексы(nullptr так как он уже загружен в видеопамять)*/
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_points_colors_va->indexesCount()), GL_UNSIGNED_INT, nullptr);
 
         /*Реденерим*/
         ImGui::Render();
@@ -239,26 +219,28 @@ namespace waza3d {
             return -1;
         }
 
-        /*Создаем Layout для двух буферов, которые состоят из vec3*/
-        BufferLayout buffer_layout_vec3{ShaderDataType::Float3};
+        /*Создаем Layout буфера, в котором друг за другом идет позиция и цвет*/
+        BufferLayout buffer_layout_2vec3{ 
+            ShaderDataType::Float3, 
+            ShaderDataType::Float3 
+        };
 
         /*Генерируем буфер для передачи данных в видеокарту*/
-        m_points_vb = std::make_unique<VertexBuffer>(points, sizeof(points), buffer_layout_vec3, VertexBuffer::UsageType::Static);
-        m_colors_vb = std::make_unique<VertexBuffer>(colors, sizeof(colors), buffer_layout_vec3, VertexBuffer::UsageType::Static);
+        m_points_colors_vb = std::make_unique<VertexBuffer>(
+            points_colors_for_index_buf, sizeof(points_colors_for_index_buf), buffer_layout_2vec3, VertexBuffer::UsageType::Static
+            );
+        /*Генерируем индексный буфер*/
+        m_points_colors_ib = std::make_unique<IndexBuffer>(
+            indexes, sizeof(indexes)/sizeof(GLuint), VertexBuffer::UsageType::Static
+            );
+
 
         /*Генерируем и назначаем текущим VertexArray*/
-        m_vertex_array = std::make_unique<VertexArray>();
+        m_points_colors_va = std::make_unique<VertexArray>();
 
         /*Связываем буферы c массивом*/
-        m_vertex_array->addBuffer(*m_points_vb);
-        m_vertex_array->addBuffer(*m_colors_vb);
-
-        /*Проделаем все тоже самое для буфера в котором друг за другом идет позиция и цвет*/
-        BufferLayout buffer_layout_2vec3{ ShaderDataType::Float3, ShaderDataType::Float3 };
-        m_points_colors_vb = std::make_unique<VertexBuffer>(points_colors, sizeof(points_colors), buffer_layout_2vec3, VertexBuffer::UsageType::Static);
-        m_points_colors_va = std::make_unique<VertexArray>();
-        m_points_colors_va->addBuffer(*m_points_colors_vb);
-
+        m_points_colors_va->addVertexBuffer(*m_points_colors_vb);
+        m_points_colors_va->setIndexBuffer(*m_points_colors_ib);
         return 0;  
 	}
 

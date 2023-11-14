@@ -9,6 +9,7 @@ namespace waza3d {
 	class ShaderProgram;
 	class VertexBuffer;
 	class VertexArray;
+	class IndexBuffer;
 
 	class Window
 	{
@@ -57,14 +58,15 @@ namespace waza3d {
 		
 		/*Укалатель на программу с шейдерами*/
 		std::unique_ptr<ShaderProgram> m_shader_program;
-		/*Указатели на буферы*/
-		std::unique_ptr<VertexBuffer> m_points_vb;
-		std::unique_ptr<VertexBuffer> m_colors_vb;
+		
+		/*Указатель на вертексный буфер*/
+		std::unique_ptr<VertexBuffer> m_points_colors_vb;
+
+		/*Указатель на индексный буфер*/
+		std::unique_ptr<IndexBuffer> m_points_colors_ib;
 
 		/*Указатель на VertexArray, который хранит все состояния, необходимые для предоставления данных о вершинах*/
-		std::unique_ptr<VertexArray> m_vertex_array;
-
-		std::unique_ptr<VertexBuffer> m_points_colors_vb;
 		std::unique_ptr<VertexArray> m_points_colors_va;
+
 	};
 }

@@ -1,5 +1,6 @@
 #include "vertex_array.hpp"
 #include "vertex_buffer.hpp"
+#include "index_buffer.hpp"
 #include "logs.hpp"
 
 #include <glad/glad.h>
@@ -21,20 +22,24 @@ namespace waza3d {
 	{
 		m_id = other.m_id;
 		m_elem_count = other.m_elem_count;
+		m_indexes_count = other.m_indexes_count;
 		other.m_id = 0;
 		other.m_elem_count = 0;
+		other.m_indexes_count = 0;
 	}
 
 	VertexArray& VertexArray::operator=(VertexArray&& other) noexcept
 	{
 		m_id = other.m_id;
 		m_elem_count = other.m_elem_count;
+		m_indexes_count = other.m_indexes_count;
 		other.m_id = 0;
 		other.m_elem_count = 0;
+		other.m_indexes_count = 0;
 		return *this;
 	}
 
-	void VertexArray::addBuffer(const VertexBuffer& vertex_buffer)
+	void VertexArray::addVertexBuffer(const VertexBuffer& vertex_buffer)
 	{
 		/*Назначаем буфер и массив активными*/
 		bind();
@@ -58,6 +63,14 @@ namespace waza3d {
 		}
 	}
 
+	void VertexArray::setIndexBuffer(const IndexBuffer& index_buffer)
+	{
+		/*Назначаем буфер и массив активными*/
+		bind();
+		index_buffer.bind();
+		m_indexes_count = index_buffer.count();
+	}
+
 	void VertexArray::bind() const
 	{
 		glBindVertexArray(m_id);
@@ -66,5 +79,9 @@ namespace waza3d {
 	void VertexArray::unbind()
 	{
 		glBindVertexArray(0);
+	}
+	size_t VertexArray::indexesCount() const
+	{
+		return m_indexes_count;
 	}
 }
