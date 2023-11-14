@@ -1,7 +1,8 @@
 #pragma once
 
 namespace waza3d {
-
+    
+    /* Класс управления программой вертексного и фрагментарного шейдеров */
     class ShaderProgram {
 
         bool m_isCompiled = false;

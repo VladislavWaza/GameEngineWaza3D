@@ -2,6 +2,7 @@
 
 namespace waza3d {
 
+	/* Класс управления буфером для передачи данных о вершинах в видеопамять */
 	class VertexBuffer {
 		unsigned int m_id = 0;
 
