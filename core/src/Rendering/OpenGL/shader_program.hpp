@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/mat4x4.hpp>
 namespace waza3d {
     
     /*Класс управления программой вертексного и фрагментарного шейдеров */
@@ -26,6 +27,7 @@ namespace waza3d {
         bool isCompiled();
         void bind() const;
         static void unbind();
+        void setMatrix4(const char* name, const glm::mat4& matrix) const;
 
     private:
         bool createShader(const char* shader_src, const ShaderType shader_type, unsigned int& shader_id);

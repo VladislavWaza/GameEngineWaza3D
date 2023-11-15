@@ -13,6 +13,9 @@
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 
+#include <glm/mat4x4.hpp>
+#include <glm/trigonometric.hpp>
+
 namespace waza3d {
 
 
@@ -32,10 +35,11 @@ namespace waza3d {
         "#version 460\n"
         "layout(location = 0) in vec3 vertex_position;"
         "layout(location = 1) in vec3 vertex_color;"
+        "uniform mat4 model_matrix;" //uniform одинаков для всех вызовов шейдера 
         "out vec3 color;"
         "void main() {"
         "   color = vertex_color;"
-        "   gl_Position = vec4(vertex_position, 1.0);"
+        "   gl_Position = model_matrix * vec4(vertex_position, 1.0);"
         "}";
 
     const char* fragment_shader =
@@ -45,6 +49,11 @@ namespace waza3d {
         "void main() {"
         "   frag_color = vec4(color, 1.0);"
         "}";
+
+    float scale[3] = { 1.f, 1.f, 1.f};
+    float rotate = 0.f;
+    float translate[3] = { 0.f, 0.f, 0.f };
+
 
 	Window::Window(unsigned int width, unsigned int height, const std::string& title)
         :m_data({ width, height, title })
@@ -82,11 +91,12 @@ namespace waza3d {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        /*Рисуем демо окно*/
-        //ImGui::ShowDemoWindow();
 
         ImGui::Begin("Background color window");
         ImGui::ColorEdit4("Background color", m_background_color);
+        ImGui::SliderFloat3("Scale", scale, 0.f, 2.f);
+        ImGui::SliderFloat("Rotate", &rotate, 0.f, 360.f);
+        ImGui::SliderFloat3("Translate", translate, -1.f, 1.f);
 
         ImGui::End();
 
@@ -95,6 +105,31 @@ namespace waza3d {
         m_points_colors_va->bind();
         /*Отрисовываем, выбираем тип, число вертексов, тип, указатель на индексы(nullptr так как он уже загружен в видеопамять)*/
         glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_points_colors_va->indexesCount()), GL_UNSIGNED_INT, nullptr);
+
+        /*Совершаем трансформации над объектом и задаем матрицу трансформаций в шейдер*/
+        glm::mat4 scale_matrix(
+            scale[0], 0, 0, 0,
+            0, scale[1], 0, 0,
+            0, 0, scale[2], 0,
+            0, 0, 0, 1);
+
+        float rotate_in_radians = glm::radians(rotate);
+        glm::mat4 rotate_matrix(
+            cos(rotate_in_radians), sin(rotate_in_radians), 0, 0,
+            -sin(rotate_in_radians), cos(rotate_in_radians), 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1);
+
+        glm::mat4 translate_matrix(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            translate[0], translate[1], translate[2], 1);
+
+
+        m_shader_program->setMatrix4("model_matrix", translate_matrix * rotate_matrix * scale_matrix);
+
+
 
         /*Реденерим*/
         ImGui::Render();

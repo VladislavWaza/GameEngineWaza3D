@@ -1,7 +1,8 @@
 #include "shader_program.hpp"
 #include "logs.hpp"
 
-#include "glad/glad.h"
+#include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace waza3d {
 
@@ -145,5 +146,12 @@ namespace waza3d {
     void ShaderProgram::unbind()
     {
         glUseProgram(0);
+    }
+
+    void ShaderProgram::setMatrix4(const char* name, const glm::mat4& matrix) const
+    {
+        /*Отправлем матрицу трансформации в uniform
+        * Для этого получаем положение uniform, задаем количество, нужно ли транспонировать и данные*/
+        glUniformMatrix4fv(glGetUniformLocation(m_id, name), 1, GL_FALSE, glm::value_ptr(matrix));
     }
 }
