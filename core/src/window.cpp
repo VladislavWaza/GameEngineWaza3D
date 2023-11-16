@@ -20,14 +20,15 @@ namespace waza3d {
 
 
     GLfloat points_colors_for_index_buf[] = {
-        0.4f, -0.25f, 0.0f,     0.3f, 0.75f, 0.63f,
-        0.5f, 0.5f, 0.0f,       0.7f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 0.5f,
-        -0.4f, 0.25f, 0.0f,     0.6f, 0.0f, 0.6f,
+        0.f, 0.43f, 0.0f,       0.7f, 0.f, 0.f,
+        -0.215f, 0.0f, 0.0f,    0.f, 0.7f, 0.f,
+        0.215f, 0.0f, 0.0f,     0.f, 0.f, 0.7f,
+        0.f, 0.143f, 0.43f,     0.7f, 0.7f, 0.7f,
+
     };
 
     GLuint indexes[] = {
-        0, 1, 2, 3, 2, 1
+        0, 1, 2, 0, 1, 3, 1, 2, 3, 0, 2, 3
     };
 
     /*Код шейдеров на языке GLSL*/
@@ -51,7 +52,7 @@ namespace waza3d {
         "}";
 
     float scale[3] = { 1.f, 1.f, 1.f};
-    float rotate = 0.f;
+    float rotate[3] = { 0.f, 0.f, 0.f };
     float translate[3] = { 0.f, 0.f, 0.f };
 
 
@@ -95,7 +96,9 @@ namespace waza3d {
         ImGui::Begin("Background color window");
         ImGui::ColorEdit4("Background color", m_background_color);
         ImGui::SliderFloat3("Scale", scale, 0.f, 2.f);
-        ImGui::SliderFloat("Rotate", &rotate, 0.f, 360.f);
+        ImGui::SliderFloat("RotateX", &rotate[0], 0.f, 360.f);
+        ImGui::SliderFloat("RotateY", &rotate[1], 0.f, 360.f);
+        ImGui::SliderFloat("RotateZ", &rotate[2], 0.f, 360.f);
         ImGui::SliderFloat3("Translate", translate, -1.f, 1.f);
 
         ImGui::End();
@@ -113,12 +116,27 @@ namespace waza3d {
             0, 0, scale[2], 0,
             0, 0, 0, 1);
 
-        float rotate_in_radians = glm::radians(rotate);
-        glm::mat4 rotate_matrix(
-            cos(rotate_in_radians), sin(rotate_in_radians), 0, 0,
-            -sin(rotate_in_radians), cos(rotate_in_radians), 0, 0,
+        float rir[3] = { glm::radians(rotate[0]), glm::radians(rotate[1]), glm::radians(rotate[2])}; //rotate_in_radians
+        glm::mat4 rotate_matrixX(
+            1, 0, 0, 0,
+            0, cos(rir[0]), -sin(rir[0]), 0,
+            0, sin(rir[0]), cos(rir[0]), 0,
+            0, 0, 0, 1
+        );
+
+        glm::mat4 rotate_matrixY(
+            cos(rir[1]), 0, sin(rir[1]), 0,
+            0, 1, 0, 0,
+            -sin(rir[1]), 0, cos(rir[1]), 0,
+            0, 0, 0, 1
+        );
+
+        glm::mat4 rotate_matrixZ(
+            cos(rir[2]), -sin(rir[2]), 0, 0,
+            sin(rir[2]), cos(rir[2]), 0, 0,
             0, 0, 1, 0,
-            0, 0, 0, 1);
+            0, 0, 0, 1
+        );
 
         glm::mat4 translate_matrix(
             1, 0, 0, 0,
@@ -127,7 +145,7 @@ namespace waza3d {
             translate[0], translate[1], translate[2], 1);
 
 
-        m_shader_program->setMatrix4("model_matrix", translate_matrix * rotate_matrix * scale_matrix);
+        m_shader_program->setMatrix4("model_matrix", translate_matrix * rotate_matrixX * rotate_matrixY * rotate_matrixZ * scale_matrix);
 
 
 
