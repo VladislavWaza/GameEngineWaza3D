@@ -7,6 +7,7 @@ set(ENGINE_PUBLIC_INCLUDES
 	includes/logs.hpp
 	includes/event.hpp
 	includes/camera.hpp
+	includes/model.hpp
 )
 
 set(ENGINE_PRIVATE_INCLUDES
@@ -26,6 +27,7 @@ set(ENGINE_PRIVATE_SOURCES
 	src/Rendering/OpenGL/buffer_layout.cpp
 	src/Rendering/OpenGL/index_buffer.cpp
 	src/camera.cpp
+	src/model.cpp
 )
 
 set(ENGINE_ALL_SOURCES

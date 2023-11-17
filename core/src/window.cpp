@@ -3,9 +3,8 @@
 #include "event.hpp"
 #include "Rendering/OpenGL/shader_program.hpp"
 #include "Rendering/OpenGL/vertex_buffer.hpp"
-#include "Rendering/OpenGL/vertex_array.hpp"
-#include "Rendering/OpenGL/index_buffer.hpp"
 #include "camera.hpp"
+#include "model.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -18,19 +17,6 @@
 #include <glm/trigonometric.hpp>
 
 namespace waza3d {
-
-
-    GLfloat points_colors_for_index_buf[] = {
-        0.f, 0.43f, 0.0f,       0.7f, 0.f, 0.f,
-        -0.215f, 0.0f, 0.0f,    0.f, 0.7f, 0.f,
-        0.215f, 0.0f, 0.0f,     0.f, 0.f, 0.7f,
-        0.f, 0.143f, 0.43f,     0.7f, 0.7f, 0.7f,
-
-    };
-
-    GLuint indexes[] = {
-        0, 1, 2, 0, 1, 3, 1, 2, 3, 0, 2, 3
-    };
 
     /*Код шейдеров на языке GLSL*/
     const char* vertex_shader =
@@ -114,9 +100,9 @@ namespace waza3d {
 
         /*Подключаем программу шейдеров и VertexArray*/
         m_shader_program->bind();
-        m_points_colors_va->bind();
+        m_model->bind();
         /*Отрисовываем, выбираем тип, число вертексов, тип, указатель на индексы(nullptr так как он уже загружен в видеопамять)*/
-        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_points_colors_va->indexesCount()), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_model->getIndexesCount()), GL_UNSIGNED_INT, nullptr);
 
         /*Совершаем трансформации над объектом и задаем матрицу трансформаций в шейдер*/
         glm::mat4 scale_matrix(
@@ -287,27 +273,22 @@ namespace waza3d {
         }
 
         /*Создаем Layout буфера, в котором друг за другом идет позиция и цвет*/
-        BufferLayout buffer_layout_2vec3{ 
-            ShaderDataType::Float3, 
-            ShaderDataType::Float3 
+        BufferLayout buffer_layout_2vec3{
+            ShaderDataType::Float3,
+            ShaderDataType::Float3
         };
 
-        /*Генерируем буфер для передачи данных в видеокарту*/
-        m_points_colors_vb = std::make_unique<VertexBuffer>(
-            points_colors_for_index_buf, sizeof(points_colors_for_index_buf), buffer_layout_2vec3, VertexBuffer::UsageType::Static
-            );
-        /*Генерируем индексный буфер*/
-        m_points_colors_ib = std::make_unique<IndexBuffer>(
-            indexes, sizeof(indexes)/sizeof(GLuint), VertexBuffer::UsageType::Static
-            );
+        m_model = new Model( {
+            0.f, 0.43f, 0.0f,       0.7f, 0.f, 0.f,     //0
+            -0.215f, 0.0f, 0.0f,    0.f, 0.7f, 0.f,     //1
+            0.215f, 0.0f, 0.0f,     0.f, 0.f, 0.7f,     //2
+            0.f, 0.143f, 0.43f,     0.7f, 0.7f, 0.7f,   //3
+        }, {
+            0, 1, 2, 0, 1, 3, 1, 2, 3, 0, 2, 3 //indexes
+        }, buffer_layout_2vec3, VertexBuffer::UsageType::Static);
 
 
-        /*Генерируем и назначаем текущим VertexArray*/
-        m_points_colors_va = std::make_unique<VertexArray>();
 
-        /*Связываем буферы c массивом*/
-        m_points_colors_va->addVertexBuffer(*m_points_colors_vb);
-        m_points_colors_va->setIndexBuffer(*m_points_colors_ib);
         return 0;  
 	}
 
