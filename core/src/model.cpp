@@ -16,15 +16,15 @@ namespace waza3d {
 		std::copy(indexes.begin(), indexes.end(), m_indexes);
 
 
-		/*Генерируем буфер для передачи данных в видеокарту*/
+		/*Р“РµРЅРµСЂРёСЂСѓРµРј Р±СѓС„РµСЂ РґР»СЏ РїРµСЂРµРґР°С‡Рё РґР°РЅРЅС‹С… РІ РІРёРґРµРѕРєР°СЂС‚Сѓ*/
 		m_vertex_buffer = std::make_unique<VertexBuffer>(m_points, sizeof(float) * m_points_count, layout, points_usage);
-		/*Генерируем индексный буфер*/
+		/*Р“РµРЅРµСЂРёСЂСѓРµРј РёРЅРґРµРєСЃРЅС‹Р№ Р±СѓС„РµСЂ*/
 		m_index_buffer = std::make_unique<IndexBuffer>(m_indexes, m_indexes_count, index_usage);
 
-		/*Генерируем и назначаем текущим VertexArray*/
+		/*Р“РµРЅРµСЂРёСЂСѓРµРј Рё РЅР°Р·РЅР°С‡Р°РµРј С‚РµРєСѓС‰РёРј VertexArray*/
 		m_vertex_array = std::make_unique<VertexArray>();
 
-		/*Связываем буферы c массивом*/
+		/*РЎРІСЏР·С‹РІР°РµРј Р±СѓС„РµСЂС‹ c РјР°СЃСЃРёРІРѕРј*/
 		m_vertex_array->addVertexBuffer(*m_vertex_buffer);
 		m_vertex_array->setIndexBuffer(*m_index_buffer);
 	}

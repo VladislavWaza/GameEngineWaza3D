@@ -285,7 +285,7 @@ namespace waza3d {
             0.f, 0.143f, 0.43f,     0.7f, 0.7f, 0.7f,   //3
         }, {
             0, 1, 2, 0, 1, 3, 1, 2, 3, 0, 2, 3 //indexes
-        }, buffer_layout_2vec3, VertexBuffer::UsageType::Static);
+        }, buffer_layout_2vec3, VertexBuffer::UsageType::Static, VertexBuffer::UsageType::Static);
 
 
 
