@@ -5,6 +5,7 @@
 #include "Rendering/OpenGL/vertex_buffer.hpp"
 #include "Rendering/OpenGL/vertex_array.hpp"
 #include "Rendering/OpenGL/index_buffer.hpp"
+#include "camera.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -36,11 +37,12 @@ namespace waza3d {
         "#version 460\n"
         "layout(location = 0) in vec3 vertex_position;"
         "layout(location = 1) in vec3 vertex_color;"
-        "uniform mat4 model_matrix;" //uniform одинаков для всех вызовов шейдера 
+        "uniform mat4 model_matrix;" //uniform одинаков для всех вызовов шейдера
+        "uniform mat4 camera_matrix;" //uniform одинаков для всех вызовов шейдера 
         "out vec3 color;"
         "void main() {"
         "   color = vertex_color;"
-        "   gl_Position = model_matrix * vec4(vertex_position, 1.0);"
+        "   gl_Position = camera_matrix * model_matrix * vec4(vertex_position, 1.0);"
         "}";
 
     const char* fragment_shader =
@@ -54,6 +56,11 @@ namespace waza3d {
     float scale[3] = { 1.f, 1.f, 1.f};
     float rotate[3] = { 0.f, 0.f, 0.f };
     float translate[3] = { 0.f, 0.f, 0.f };
+
+    float camera_pos[3] = { 0.f, 0.f, -1.f };
+    float camera_rotation[3] = { 180.f, 0.f, 0.f };
+    bool perspective_camera = false;
+    Camera camera;
 
 
 	Window::Window(unsigned int width, unsigned int height, const std::string& title)
@@ -96,10 +103,12 @@ namespace waza3d {
         ImGui::Begin("Background color window");
         ImGui::ColorEdit4("Background color", m_background_color);
         ImGui::SliderFloat3("Scale", scale, 0.f, 2.f);
-        ImGui::SliderFloat("RotateX", &rotate[0], 0.f, 360.f);
-        ImGui::SliderFloat("RotateY", &rotate[1], 0.f, 360.f);
-        ImGui::SliderFloat("RotateZ", &rotate[2], 0.f, 360.f);
+        ImGui::SliderFloat3("Rotation", rotate, 0.f, 360.f);
         ImGui::SliderFloat3("Translate", translate, -1.f, 1.f);
+
+        ImGui::SliderFloat3("Camera Position", camera_pos, -3.f, 3.f);
+        ImGui::SliderFloat3("Camera Rotation", camera_rotation, 0.f, 360.f);
+        ImGui::Checkbox("Perspective camera", &perspective_camera);
 
         ImGui::End();
 
@@ -144,9 +153,14 @@ namespace waza3d {
             0, 0, 1, 0,
             translate[0], translate[1], translate[2], 1);
 
-
+        camera.setPositionRotation(
+            glm::vec3(camera_pos[0], camera_pos[1], camera_pos[2]), 
+            glm::vec3(camera_rotation[0], camera_rotation[1], camera_rotation[2])
+        );
+        camera.setProjectionMode(perspective_camera ? Camera::ProjectionMode::Perspective : Camera::ProjectionMode::Orthographic);
+        
         m_shader_program->setMatrix4("model_matrix", translate_matrix * rotate_matrixX * rotate_matrixY * rotate_matrixZ * scale_matrix);
-
+        m_shader_program->setMatrix4("camera_matrix", camera.getProjectionMatrix() * camera.getViewMatrix());
 
 
         /*Реденерим*/
