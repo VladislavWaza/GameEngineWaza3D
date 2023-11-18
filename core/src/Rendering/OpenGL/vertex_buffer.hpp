@@ -3,6 +3,7 @@
 
 namespace waza3d {
 
+	/*Тип данных передаваемых в шейдер*/
 	enum class ShaderDataType {
 		Float,
 		Float2,
@@ -14,6 +15,7 @@ namespace waza3d {
 		Int4
 	};
 
+	/*Описание формата элемента буфер*/
 	struct BufferElement
 	{
 		ShaderDataType type;
@@ -33,6 +35,7 @@ namespace waza3d {
 	public:
 		BufferLayout(std::initializer_list<BufferElement> elems);
 		const std::vector<BufferElement>& getElems() const;
+		/*Получаем шаг смещения*/
 		size_t getStride() const;
 
 	};
@@ -59,9 +62,11 @@ namespace waza3d {
 		VertexBuffer(const VertexBuffer&) = delete;
 		VertexBuffer& operator=(const VertexBuffer&) = delete;
 
+		/*Связывание*/
 		void bind() const;
-		static void	unbind();
-
+		/*Отвязывание*/
+		static void unbind();
+		/*Получение лейаута*/
 		const BufferLayout& getLayout() const;
 	};
 }

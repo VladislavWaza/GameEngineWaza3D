@@ -15,6 +15,7 @@ namespace waza3d {
             Fragment
         };
 
+        /*Код шейдеров: вертексного и фрагментарного*/
         ShaderProgram(const char* vertex_shader_src, const char* fragment_shader_src);
         ShaderProgram(ShaderProgram&&) noexcept;
         ShaderProgram& operator=(ShaderProgram&&) noexcept;
@@ -24,9 +25,13 @@ namespace waza3d {
         ShaderProgram(const ShaderProgram&) = delete;
         ShaderProgram& operator=(const ShaderProgram&) = delete;
 
+        /*Удалось ли скомпилировать и слинковать программу*/
         bool isCompiled();
+        /*Связывание*/
         void bind() const;
+        /*Отвязывание*/
         static void unbind();
+        /*Назначение uniform матрицы*/
         void setMatrix4(const char* name, const glm::mat4& matrix) const;
 
     private:

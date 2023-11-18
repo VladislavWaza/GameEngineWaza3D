@@ -18,8 +18,10 @@ namespace waza3d {
 		Application& operator=(const Application&) = delete;
 		Application& operator=(Application&&) = delete;
 
+		/*Запуск, в методе содержится основной цикл работы*/
 		virtual int start(unsigned int width, unsigned int height, const char* title);
 
+		/*Вызывается в цикле работы*/
 		virtual void onUpdate() {};
 	
 	private:

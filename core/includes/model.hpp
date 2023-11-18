@@ -21,6 +21,7 @@ namespace waza3d {
 		std::unique_ptr<IndexBuffer> m_index_buffer;
 		std::unique_ptr<VertexArray> m_vertex_array;
 	public:
+		/*Список вертексов, список индексов, формат вертексов, тип использования буфера вертексов, тип использования буфера индексов*/
 		Model(
 			std::initializer_list<float> points, 
 			std::initializer_list<unsigned int> indexes,
@@ -32,7 +33,7 @@ namespace waza3d {
 		size_t getPointsCount() const;
 		size_t getIndexesCount() const;
 
-		/*Назначает активным VertexArray*/
+		/*Назначает активным массив вертексов*/
 		void bind() const;
 	};
 	

@@ -20,8 +20,11 @@ namespace waza3d {
 
 		/*Назначает текущими буфер и массив и добавляет буфер*/
 		void addVertexBuffer(const VertexBuffer& vertex_buffer);
+		/*Назначает текущими буфер индексов и добавляет буфер индексов*/
 		void setIndexBuffer(const IndexBuffer& index_buffer);
+		/*Связывание*/
 		void bind() const;
+		/*Отвязывание*/
 		static void unbind();
 		size_t indexesCount() const;
 	};

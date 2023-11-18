@@ -19,6 +19,7 @@ namespace waza3d {
 		EventsCount
 	};
 
+	/*Базовый ивент, от которого наследуются остальные*/
 	struct BaseEvent {
 		virtual ~BaseEvent() = default;
 		virtual EventType getType() const = 0;
@@ -44,6 +45,7 @@ namespace waza3d {
 			m_event_callbacks[static_cast<size_t>(T::m_type)] = std::move(base_callback);
 		}
 
+		/*Вызывает callback соответсвующий ивенту*/
 		void dispatch(BaseEvent& event)
 		{
 			auto& callback = m_event_callbacks[static_cast<size_t>(event.getType())];
@@ -54,7 +56,7 @@ namespace waza3d {
 		}
 	};
 
-
+	/*Изменение размеров окна*/
 	struct EventWindowResize : public BaseEvent {
 		unsigned int m_width = 0;
 		unsigned int m_height = 0;
@@ -69,6 +71,7 @@ namespace waza3d {
 		}
 	};
 
+	/*Закрытие окна*/
 	struct EventWindowClose : public BaseEvent {
 		static const EventType m_type = EventType::WindowClose;
 
@@ -78,6 +81,7 @@ namespace waza3d {
 		}
 	};
 
+	/*Перемещение мыши*/
 	struct EventMouseMoved : public BaseEvent {
 		double m_x = 0.0;
 		double m_y = 0.0;
