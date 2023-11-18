@@ -1,4 +1,6 @@
 #include "model.hpp"
+#include "Rendering/OpenGL/index_buffer.hpp"
+#include "Rendering/OpenGL/vertex_array.hpp"
 
 #include <algorithm>
 

@@ -3,11 +3,13 @@
 #include <memory>
 
 #include "Rendering/OpenGL/vertex_buffer.hpp"
-#include "Rendering/OpenGL/index_buffer.hpp"
-#include "Rendering/OpenGL/vertex_array.hpp"
 
 namespace waza3d {
+	class VertexArray;
+	class IndexBuffer;
 
+	/*Класс реализующий работу с буферами и вертексами объекта
+	объект класса при создании создает все необходимые буферы*/
 	class Model
 	{
 		size_t m_points_count = 0;
@@ -30,6 +32,7 @@ namespace waza3d {
 		size_t getPointsCount() const;
 		size_t getIndexesCount() const;
 
+		/*Назначает активным VertexArray*/
 		void bind() const;
 	};
 	

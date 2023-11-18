@@ -25,7 +25,7 @@ namespace waza3d {
 		BufferElement(const ShaderDataType type);
 	};
 
-
+	/*Класс задает формат представления данных в буфере*/
 	class BufferLayout {
 		std::vector<BufferElement> m_elems;
 		/*шаг смещения*/
