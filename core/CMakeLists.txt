@@ -16,6 +16,7 @@ set(ENGINE_PRIVATE_INCLUDES
 	src/Rendering/OpenGL/vertex_buffer.hpp
 	src/Rendering/OpenGL/vertex_array.hpp
 	src/Rendering/OpenGL/index_buffer.hpp
+	src/Rendering/OpenGL/render.hpp
 )
 
 set(ENGINE_PRIVATE_SOURCES
@@ -26,6 +27,7 @@ set(ENGINE_PRIVATE_SOURCES
 	src/Rendering/OpenGL/vertex_array.cpp
 	src/Rendering/OpenGL/buffer_layout.cpp
 	src/Rendering/OpenGL/index_buffer.cpp
+	src/Rendering/OpenGL/render.cpp
 	src/camera.cpp
 	src/model.cpp
 )

@@ -2,11 +2,10 @@
 #include "logs.hpp"
 #include "event.hpp"
 #include "Rendering/OpenGL/shader_program.hpp"
-#include "Rendering/OpenGL/vertex_buffer.hpp"
 #include "camera.hpp"
 #include "model.hpp"
+#include "Rendering/OpenGL/render.hpp"
 
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <imgui/imgui.h>
@@ -72,16 +71,16 @@ namespace waza3d {
 	void Window::onUpdate()
 	{
         /*Чистим окно заливая своим цветом*/
-        glClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);
-        glClear(GL_COLOR_BUFFER_BIT);
+        Render::setClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);
+        Render::clear();
 
-        /*Получаем хендл*/
+        /*Получаем хендл ImGui*/
         ImGuiIO& io = ImGui::GetIO();
         /*Задаем размеры*/
         io.DisplaySize.x = static_cast<float>(m_data.m_width);
         io.DisplaySize.y = static_cast<float>(m_data.m_height);
 
-        /*Начинаем новый кадр*/
+        /*Начинаем новый кадр интерфейса ImGui*/
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -98,11 +97,9 @@ namespace waza3d {
 
         ImGui::End();
 
-        /*Подключаем программу шейдеров и VertexArray*/
+        /*Подключаем программу шейдеров и рисуем модель*/
         m_shader_program->bind();
-        m_model->bind();
-        /*Отрисовываем, выбираем тип, число вертексов, тип, указатель на индексы(nullptr так как он уже загружен в видеопамять)*/
-        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_model->getIndexesCount()), GL_UNSIGNED_INT, nullptr);
+        Render::draw(*m_model);
 
         /*Совершаем трансформации над объектом и задаем матрицу трансформаций в шейдер*/
         glm::mat4 scale_matrix(
@@ -177,34 +174,33 @@ namespace waza3d {
 	{
         LOG_INFO("Creating window '{0}' with size {1}x{2}", m_data.m_title, m_data.m_width, m_data.m_height);
 
-        /* Initialize the library */
-        if (!s_GLFW_initialized)
-        {
-            if (!glfwInit())
+        /*Добавляем вывод лога GLFW при ошибке*/
+        glfwSetErrorCallback([](int error_code, const char* description)
             {
-                LOG_CRITICAL("Can't initialize GLFW!");
-                return -1;
+                LOG_CRITICAL("GLFW error: {0}", description);
             }
-            s_GLFW_initialized = true;
+        );
+
+
+        /* Инициализируем GLFW */
+        if (!glfwInit())
+        {
+            LOG_CRITICAL("Can't initialize GLFW!");
+            return -1;
         }
 
-        /* Create a windowed mode window and its OpenGL context */
+        /* Создаем окно GLFW*/
         m_window = glfwCreateWindow(m_data.m_width, m_data.m_height, m_data.m_title.c_str(), nullptr, nullptr);
         if (!m_window)
         {
             LOG_CRITICAL("Can't create window '{0}'!", m_data.m_title);
-            glfwTerminate();
-            return -1;
+            return -2;
         }
 
-        /* Make the window's context current */
-        glfwMakeContextCurrent(m_window);
-
-        /*Инициализируем GLAD, для связывания всех функций OpenGL*/
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        if (!Render::init(m_window))
         {
-            LOG_CRITICAL("Failed to initialize GLAD");
-            return -1;
+            LOG_CRITICAL("Can't initialize Render!");
+            return -3;
         }
 
         /*Кладем пользовательские данные m_data в GLFW окно m_window*/
@@ -260,7 +256,7 @@ namespace waza3d {
             [](GLFWwindow* window, int width, int height)
             {
                 /*Устанавливаем что хотим перерисовывать*/
-                glViewport(0, 0, width, height);
+                Render::setViewport(width, height, 0, 0);
             }
         );
 
@@ -295,6 +291,7 @@ namespace waza3d {
 	void Window::shutdown()
 	{
         glfwDestroyWindow(m_window);
+        ImGui::DestroyContext();
         glfwTerminate();
 	}
 
