@@ -5,12 +5,10 @@
 #include "camera.hpp"
 #include "model.hpp"
 #include "Rendering/OpenGL/render.hpp"
-
-#include <GLFW/glfw3.h>
+#include "Modules/UI_module.hpp"
 
 #include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
-#include <imgui/backends/imgui_impl_glfw.h>
+#include <GLFW/glfw3.h>
 
 #include <glm/mat4x4.hpp>
 #include <glm/trigonometric.hpp>
@@ -51,16 +49,8 @@ namespace waza3d {
 	Window::Window(unsigned int width, unsigned int height, const std::string& title)
         :m_data({ width, height, title })
 	{
+        /*Инициализируем окно*/
 		int resCode = init();
-
-        /*Инициализируем ImGui*/
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGui_ImplOpenGL3_Init();
-
-        /*Подключем обработчик встроенный событий
-          Встроенные события будут обрабатывать ПОСЛЕ заданных мной*/
-        ImGui_ImplGlfw_InitForOpenGL(m_window, true);
 	}
 
 	Window::~Window()
@@ -73,29 +63,6 @@ namespace waza3d {
         /*Чистим окно заливая своим цветом*/
         Render::setClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);
         Render::clear();
-
-        /*Получаем хендл ImGui*/
-        ImGuiIO& io = ImGui::GetIO();
-        /*Задаем размеры*/
-        io.DisplaySize.x = static_cast<float>(m_data.m_width);
-        io.DisplaySize.y = static_cast<float>(m_data.m_height);
-
-        /*Начинаем новый кадр интерфейса ImGui*/
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        ImGui::Begin("Background color window");
-        ImGui::ColorEdit4("Background color", m_background_color);
-        ImGui::SliderFloat3("Scale", scale, 0.f, 2.f);
-        ImGui::SliderFloat3("Rotation", rotate, 0.f, 360.f);
-        ImGui::SliderFloat3("Translate", translate, -1.f, 1.f);
-
-        ImGui::SliderFloat3("Camera Position", camera_pos, -3.f, 3.f);
-        ImGui::SliderFloat3("Camera Rotation", camera_rotation, 0.f, 360.f);
-        ImGui::Checkbox("Perspective camera", &perspective_camera);
-
-        ImGui::End();
 
         /*Подключаем программу шейдеров и рисуем модель*/
         m_shader_program->bind();
@@ -146,9 +113,23 @@ namespace waza3d {
         m_shader_program->setMatrix4("camera_matrix", camera.getProjectionMatrix() * camera.getViewMatrix());
 
 
-        /*Реденерим*/
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        /*Начинаем новый кадр интерфейса*/
+        UIModule::newFrame();
+
+        ImGui::Begin("Background color window");
+        ImGui::ColorEdit4("Background color", m_background_color);
+        ImGui::SliderFloat3("Scale", scale, 0.f, 2.f);
+        ImGui::SliderFloat3("Rotation", rotate, 0.f, 360.f);
+        ImGui::SliderFloat3("Translate", translate, -1.f, 1.f);
+
+        ImGui::SliderFloat3("Camera Position", camera_pos, -3.f, 3.f);
+        ImGui::SliderFloat3("Camera Rotation", camera_rotation, 0.f, 360.f);
+        ImGui::Checkbox("Perspective camera", &perspective_camera);
+
+        ImGui::End();
+
+        /*Реденерим интерфейс*/
+        UIModule::draw();
 
 
         glfwSwapBuffers(m_window);
@@ -260,6 +241,9 @@ namespace waza3d {
             }
         );
 
+        /*Инициализируем UI*/
+        UIModule::init(m_window);
+
         /*Создаем шейдерную программу*/
         m_shader_program = std::make_unique<ShaderProgram>(vertex_shader, fragment_shader);
         if (!m_shader_program->isCompiled())
@@ -283,15 +267,13 @@ namespace waza3d {
             0, 1, 2, 0, 1, 3, 1, 2, 3, 0, 2, 3 //indexes
         }, buffer_layout_2vec3, VertexBuffer::UsageType::Static, VertexBuffer::UsageType::Static);
 
-
-
         return 0;  
 	}
 
 	void Window::shutdown()
 	{
+        UIModule::shutdown();
         glfwDestroyWindow(m_window);
-        ImGui::DestroyContext();
         glfwTerminate();
 	}
 
