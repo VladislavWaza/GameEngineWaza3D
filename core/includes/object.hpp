@@ -6,6 +6,7 @@ namespace waza3d {
 	
 	class Model;
 
+	/*Класс хранит данные о трансформации и указатель на модель, также обеспечивает отрисовку модели*/
 	class Object {
 		const Model* m_model = nullptr;
 		float m_scale[3] = { 1.f, 1.f, 1.f };
@@ -18,10 +19,10 @@ namespace waza3d {
 		void setRotation(const float rotationX, const float rotationY, const float rotationZ);
 		void setTranslate(const float translateX, const float translateY, const float translateZ);
 
-		glm::mat4 getTranslateMatrix();
-		glm::mat4 getRotateMatrix();
-		glm::mat4 getScaleMatrix();
-		const Model* getModel();
+		glm::mat4 getTranslateMatrix() const;
+		glm::mat4 getRotateMatrix() const;
+		glm::mat4 getScaleMatrix() const;
+		void draw() const;
 	};
 
 

@@ -2,12 +2,13 @@
 #include <memory>
 
 #include "event.hpp"
-#include "camera.hpp"
 
 namespace waza3d {
 
 	class ShaderProgram;
+	class Scene;
 
+	/* Для использовния класса задать сцену, предоставив указатель на неё*/
 	/* Для использовния класса нужно переопределить функцию void onUpdate(), которая циклично вызывается*/
 	/* Для использования собстенного интерфейса нужно переопределить функцию void onUIDraw(), которая циклично вызывается*/
 	class Application 
@@ -23,18 +24,14 @@ namespace waza3d {
 		Application& operator=(Application&&) = delete;
 
 		/*Запуск, в методе содержится основной цикл работы*/
-		virtual int start(unsigned int width, unsigned int height, const char* title);
+		virtual int start(unsigned int width, unsigned int height, const char* title, Scene* scene);
 
 		/*Вызывается в цикле работы*/
 		virtual void onUpdate() {};
 		virtual void onUIDraw() {};
-
-		/*Камера*/
-		float m_camera_pos[3] = { 0.f, 0.f, -1.f };
-		float m_camera_rotation[3] = { 180.f, 0.f, 0.f };
-		bool m_perspective_camera = false;
-		Camera m_camera;
 	
+		void setScene(Scene* scene);
+		Scene* scene();
 	private:
 		std::unique_ptr<class Window> m_window;
 
@@ -43,5 +40,6 @@ namespace waza3d {
 
 		/*Указатель на программу с шейдерами*/
 		std::unique_ptr<ShaderProgram> m_shader_program;
+		Scene* m_scene = nullptr;
 	};
 }

@@ -1,5 +1,6 @@
 #include "object.hpp"
 #include "model.hpp"
+#include "Rendering/OpenGL/render.hpp"
 
 #include <glm/trigonometric.hpp>
 
@@ -30,7 +31,12 @@ namespace waza3d {
 		m_translate[2] = translateZ;
 	}
 
-	glm::mat4 Object::getTranslateMatrix()
+	void Object::draw() const
+	{
+		Render::draw(*m_model);
+	}
+
+	glm::mat4 Object::getTranslateMatrix() const
 	{
 		glm::mat4 translate_matrix(
 			1, 0, 0, 0,
@@ -40,7 +46,7 @@ namespace waza3d {
 		return translate_matrix;
 	}
 
-	glm::mat4 Object::getRotateMatrix()
+	glm::mat4 Object::getRotateMatrix() const
 	{
 		float rir[3] = { //rir - rotate_in_radians 
 			glm::radians(m_rotation[0]), 
@@ -70,7 +76,7 @@ namespace waza3d {
 		return rotate_matrixX * rotate_matrixY * rotate_matrixZ;
 	}
 
-	glm::mat4 Object::getScaleMatrix()
+	glm::mat4 Object::getScaleMatrix() const
 	{
 		glm::mat4 scale_matrix(
 			m_scale[0], 0, 0, 0,
@@ -78,9 +84,5 @@ namespace waza3d {
 			0, 0, m_scale[2], 0,
 			0, 0, 0, 1);
 		return scale_matrix;
-	}
-	const Model* Object::getModel()
-	{
-		return m_model;
 	}
 }

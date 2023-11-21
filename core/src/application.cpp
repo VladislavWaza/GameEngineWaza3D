@@ -7,6 +7,7 @@
 #include "Modules/UI_module.hpp"
 #include "model.hpp"
 #include "object.hpp"
+#include "scene.hpp"
 
 #include <imgui/imgui.h>
 
@@ -21,7 +22,7 @@ namespace waza3d {
 		LOG_INFO("Closing application!");
 	}
 
-	int Application::start(unsigned int width, unsigned int height, const char* title)
+	int Application::start(unsigned int width, unsigned int height, const char* title, Scene* scene)
 	{
 		m_window = std::make_unique<Window>(width, height, title);
 
@@ -87,6 +88,8 @@ namespace waza3d {
 			return -1;
 		}
 
+		m_scene = scene;
+
 		/*Создаем Layout буфера, в котором друг за другом идет позиция и цвет*/
 		BufferLayout buffer_layout_2vec3{
 			ShaderDataType::Float3,
@@ -102,7 +105,7 @@ namespace waza3d {
 				0, 1, 2, 0, 1, 3, 1, 2, 3, 0, 2, 3 //indexes
 			}, buffer_layout_2vec3, VertexBuffer::UsageType::Static, VertexBuffer::UsageType::Static);
 
-		Object obj(model);
+		m_scene->addObject("piramid", model);
 
 		/*Фоновый цвет в формате RGBA*/
 		float background_color[4] = { 0.7f, 0.7f, 0.7f, 0.f };
@@ -116,23 +119,12 @@ namespace waza3d {
 			Render::setClearColor(background_color[0], background_color[1], background_color[2], background_color[3]);
 			Render::clear();
 
-			/*Подключаем программу шейдеров и рисуем модель*/
-			m_shader_program->bind();
-			Render::draw(*(obj.getModel()));
+			/*Подключаем программу шейдеров и рисуем cцену*/
+			m_scene->draw(*m_shader_program);
 
-			obj.setScale(scale[0], scale[1], scale[2]);
-			obj.setRotation(rotate[0], rotate[1], rotate[2]);
-			obj.setTranslate(translate[0], translate[1], translate[2]);
-
-			m_camera.setPositionRotation(
-				glm::vec3(m_camera_pos[0], m_camera_pos[1], m_camera_pos[2]),
-				glm::vec3(m_camera_rotation[0], m_camera_rotation[1], m_camera_rotation[2])
-			);
-			m_camera.setProjectionMode(m_perspective_camera ? Camera::ProjectionMode::Perspective : Camera::ProjectionMode::Orthographic);
-
-			m_shader_program->setMatrix4("model_matrix", obj.getTranslateMatrix() * obj.getRotateMatrix() * obj.getScaleMatrix());
-			m_shader_program->setMatrix4("camera_matrix", m_camera.getProjectionMatrix() * m_camera.getViewMatrix());
-
+			m_scene->getObject("piramid").setScale(scale[0], scale[1], scale[2]);
+			m_scene->getObject("piramid").setRotation(rotate[0], rotate[1], rotate[2]);
+			m_scene->getObject("piramid").setTranslate(translate[0], translate[1], translate[2]);
 			/************************************************************************************************************/
 			/*                                              Интерфейс                                                   */
 			/************************************************************************************************************/
@@ -156,6 +148,16 @@ namespace waza3d {
 		}
 		m_window = nullptr;
         return 0;
+	}
+
+	void Application::setScene(Scene* scene)
+	{
+		m_scene = scene;
+	}
+
+	Scene* Application::scene()
+	{
+		return m_scene;
 	}
 
 }
