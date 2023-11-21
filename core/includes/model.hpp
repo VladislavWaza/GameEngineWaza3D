@@ -30,6 +30,11 @@ namespace waza3d {
 			const VertexBuffer::UsageType index_usage);
 		~Model();
 
+		Model(const Model&) = delete;
+		Model(Model&&) = delete;
+		Model& operator=(const Model&) = delete;
+		Model& operator=(Model&&) = delete;
+
 		size_t getPointsCount() const;
 		size_t getIndexesCount() const;
 
