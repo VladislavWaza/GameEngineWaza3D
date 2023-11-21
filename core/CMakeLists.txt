@@ -8,6 +8,7 @@ set(ENGINE_PUBLIC_INCLUDES
 	includes/event.hpp
 	includes/camera.hpp
 	includes/model.hpp
+	includes/object.hpp
 )
 
 set(ENGINE_PRIVATE_INCLUDES
@@ -32,6 +33,7 @@ set(ENGINE_PRIVATE_SOURCES
 	src/Modules/UI_module.cpp
 	src/camera.cpp
 	src/model.cpp
+	src/object.cpp
 )
 
 set(ENGINE_ALL_SOURCES
