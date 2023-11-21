@@ -1,50 +1,12 @@
 #include "window.hpp"
 #include "logs.hpp"
 #include "event.hpp"
-#include "Rendering/OpenGL/shader_program.hpp"
-#include "camera.hpp"
-#include "model.hpp"
 #include "Rendering/OpenGL/render.hpp"
 #include "Modules/UI_module.hpp"
 
-#include <imgui/imgui.h>
 #include <GLFW/glfw3.h>
 
-#include <glm/mat4x4.hpp>
-#include <glm/trigonometric.hpp>
-
 namespace waza3d {
-
-    /*Код шейдеров на языке GLSL*/
-    const char* vertex_shader =
-        "#version 460\n"
-        "layout(location = 0) in vec3 vertex_position;"
-        "layout(location = 1) in vec3 vertex_color;"
-        "uniform mat4 model_matrix;" //uniform одинаков для всех вызовов шейдера
-        "uniform mat4 camera_matrix;" //uniform одинаков для всех вызовов шейдера 
-        "out vec3 color;"
-        "void main() {"
-        "   color = vertex_color;"
-        "   gl_Position = camera_matrix * model_matrix * vec4(vertex_position, 1.0);"
-        "}";
-
-    const char* fragment_shader =
-        "#version 460\n"
-        "in vec3 color;"
-        "out vec4 frag_color;"
-        "void main() {"
-        "   frag_color = vec4(color, 1.0);"
-        "}";
-
-    float scale[3] = { 1.f, 1.f, 1.f};
-    float rotate[3] = { 0.f, 0.f, 0.f };
-    float translate[3] = { 0.f, 0.f, 0.f };
-
-    float camera_pos[3] = { 0.f, 0.f, -1.f };
-    float camera_rotation[3] = { 180.f, 0.f, 0.f };
-    bool perspective_camera = false;
-    Camera camera;
-
 
 	Window::Window(unsigned int width, unsigned int height, const std::string& title)
         :m_data({ width, height, title })
@@ -60,78 +22,6 @@ namespace waza3d {
 
 	void Window::onUpdate()
 	{
-        /*Чистим окно заливая своим цветом*/
-        Render::setClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);
-        Render::clear();
-
-        /*Подключаем программу шейдеров и рисуем модель*/
-        m_shader_program->bind();
-        Render::draw(*m_model);
-
-        /*Совершаем трансформации над объектом и задаем матрицу трансформаций в шейдер*/
-        glm::mat4 scale_matrix(
-            scale[0], 0, 0, 0,
-            0, scale[1], 0, 0,
-            0, 0, scale[2], 0,
-            0, 0, 0, 1);
-
-        float rir[3] = { glm::radians(rotate[0]), glm::radians(rotate[1]), glm::radians(rotate[2])}; //rotate_in_radians
-        glm::mat4 rotate_matrixX(
-            1, 0, 0, 0,
-            0, cos(rir[0]), -sin(rir[0]), 0,
-            0, sin(rir[0]), cos(rir[0]), 0,
-            0, 0, 0, 1
-        );
-
-        glm::mat4 rotate_matrixY(
-            cos(rir[1]), 0, sin(rir[1]), 0,
-            0, 1, 0, 0,
-            -sin(rir[1]), 0, cos(rir[1]), 0,
-            0, 0, 0, 1
-        );
-
-        glm::mat4 rotate_matrixZ(
-            cos(rir[2]), -sin(rir[2]), 0, 0,
-            sin(rir[2]), cos(rir[2]), 0, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 1
-        );
-
-        glm::mat4 translate_matrix(
-            1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, 0,
-            translate[0], translate[1], translate[2], 1);
-
-        camera.setPositionRotation(
-            glm::vec3(camera_pos[0], camera_pos[1], camera_pos[2]), 
-            glm::vec3(camera_rotation[0], camera_rotation[1], camera_rotation[2])
-        );
-        camera.setProjectionMode(perspective_camera ? Camera::ProjectionMode::Perspective : Camera::ProjectionMode::Orthographic);
-        
-        m_shader_program->setMatrix4("model_matrix", translate_matrix * rotate_matrixX * rotate_matrixY * rotate_matrixZ * scale_matrix);
-        m_shader_program->setMatrix4("camera_matrix", camera.getProjectionMatrix() * camera.getViewMatrix());
-
-
-        /*Начинаем новый кадр интерфейса*/
-        UIModule::newFrame();
-
-        ImGui::Begin("Background color window");
-        ImGui::ColorEdit4("Background color", m_background_color);
-        ImGui::SliderFloat3("Scale", scale, 0.f, 2.f);
-        ImGui::SliderFloat3("Rotation", rotate, 0.f, 360.f);
-        ImGui::SliderFloat3("Translate", translate, -1.f, 1.f);
-
-        ImGui::SliderFloat3("Camera Position", camera_pos, -3.f, 3.f);
-        ImGui::SliderFloat3("Camera Rotation", camera_rotation, 0.f, 360.f);
-        ImGui::Checkbox("Perspective camera", &perspective_camera);
-
-        ImGui::End();
-
-        /*Реденерим интерфейс*/
-        UIModule::draw();
-
-
         glfwSwapBuffers(m_window);
         glfwPollEvents();
 	}
@@ -162,7 +52,6 @@ namespace waza3d {
             }
         );
 
-
         /* Инициализируем GLFW */
         if (!glfwInit())
         {
@@ -178,6 +67,7 @@ namespace waza3d {
             return -2;
         }
 
+        /*Инициализируем рендер*/
         if (!Render::init(m_window))
         {
             LOG_CRITICAL("Can't initialize Render!");
@@ -243,29 +133,6 @@ namespace waza3d {
 
         /*Инициализируем UI*/
         UIModule::init(m_window);
-
-        /*Создаем шейдерную программу*/
-        m_shader_program = std::make_unique<ShaderProgram>(vertex_shader, fragment_shader);
-        if (!m_shader_program->isCompiled())
-        {
-            LOG_CRITICAL("Failed to compile shader program");
-            return -1;
-        }
-
-        /*Создаем Layout буфера, в котором друг за другом идет позиция и цвет*/
-        BufferLayout buffer_layout_2vec3{
-            ShaderDataType::Float3,
-            ShaderDataType::Float3
-        };
-
-        m_model = new Model( {
-            0.f, 0.43f, 0.0f,       0.7f, 0.f, 0.f,     //0
-            -0.215f, 0.0f, 0.0f,    0.f, 0.7f, 0.f,     //1
-            0.215f, 0.0f, 0.0f,     0.f, 0.f, 0.7f,     //2
-            0.f, 0.143f, 0.43f,     0.7f, 0.7f, 0.7f,   //3
-        }, {
-            0, 1, 2, 0, 1, 3, 1, 2, 3, 0, 2, 3 //indexes
-        }, buffer_layout_2vec3, VertexBuffer::UsageType::Static, VertexBuffer::UsageType::Static);
 
         return 0;  
 	}

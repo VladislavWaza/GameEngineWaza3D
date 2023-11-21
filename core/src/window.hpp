@@ -6,8 +6,6 @@ struct GLFWwindow;
 
 namespace waza3d {
 	struct BaseEvent;
-	class ShaderProgram;
-	class Model;
 
 	class Window
 	{
@@ -48,12 +46,5 @@ namespace waza3d {
 		GLFWwindow* m_window = nullptr;
 		/*Структура с размерами, заголовком и функцией обработки*/
 		WindowData m_data;
-		/*Фоновый цвет в формате RGBA*/
-		float m_background_color[4] = { 0.7f, 0.7f, 0.7f, 0.f };
-		
-		/*Укалатель на программу с шейдерами*/
-		std::unique_ptr<ShaderProgram> m_shader_program;
-
-		Model* m_model;
 	};
 }
