@@ -13,27 +13,27 @@ namespace waza3d {
 	Camera::Camera(const glm::vec3& position, const glm::vec3& rotation, const ProjectionMode projection_mode)
 		:m_position(position), m_rotation(rotation), m_projection_mode(projection_mode)
 	{
-		updateViewMatrix();
+		m_update_view_matrix = true;
 		updateProjectionMatrix();
 	}
 
 	void Camera::setPosition(const glm::vec3& position)
 	{
 		m_position = position;
-		updateViewMatrix();
+		m_update_view_matrix = true;
 	}
 
 	void Camera::setRotation(const glm::vec3& rotation)
 	{
 		m_rotation = rotation;
-		updateViewMatrix();
+		m_update_view_matrix = true;
 	}
 
 	void Camera::setPositionRotation(const glm::vec3& position, const glm::vec3& rotation)
 	{
 		m_position = position;
 		m_rotation = rotation;
-		updateViewMatrix();
+		m_update_view_matrix = true;
 	}
 
 	void Camera::addMovementRotation(const glm::vec3& movement_delta, const glm::vec3& rotation_delta)
@@ -42,7 +42,7 @@ namespace waza3d {
 		m_position += m_right * movement_delta.y;
 		m_position += m_up * movement_delta.z;
 		m_rotation += rotation_delta;
-		updateViewMatrix();
+		m_update_view_matrix = true;
 	}
 
 	void Camera::setProjectionMode(const ProjectionMode projection_mode)
@@ -51,12 +51,17 @@ namespace waza3d {
 		updateProjectionMatrix();
 	}
 
-	glm::mat4 Camera::getViewMatrix() const
+	const glm::mat4& Camera::getViewMatrix()
 	{
+		if (m_update_view_matrix)
+		{
+			updateViewMatrix();
+			m_update_view_matrix = false;
+		}
 		return m_view_matrix;
 	}
 
-	glm::mat4 Camera::getProjectionMatrix() const
+	const glm::mat4& Camera::getProjectionMatrix() const
 	{
 		return m_projection_matrix;
 	}
@@ -79,19 +84,19 @@ namespace waza3d {
 	void Camera::moveForward(const float delta)
 	{
 		m_position += m_direction * delta;
-		updateViewMatrix();
+		m_update_view_matrix = true;
 	}
 
 	void Camera::moveRight(const float delta)
 	{
 		m_position += m_right * delta;
-		updateViewMatrix();
+		m_update_view_matrix = true;
 	}
 
 	void Camera::moveUp(const float delta)
 	{
 		m_position += m_up * delta;
-		updateViewMatrix();
+		m_update_view_matrix = true;
 	}
 
 	void Camera::updateViewMatrix()

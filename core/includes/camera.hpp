@@ -35,9 +35,9 @@ namespace waza3d {
 		/*Устанавливаем режим проекции и обновляем матрицу Projection*/
 		void setProjectionMode(const ProjectionMode projection_mode);
 		/*Возвращает матрицу View*/
-		glm::mat4 getViewMatrix() const;
+		const glm::mat4& getViewMatrix();
 		/*Возвращает матрицу Projection*/
-		glm::mat4 getProjectionMatrix() const;
+		const glm::mat4& getProjectionMatrix() const;
 
 		const glm::vec3& getPosition() const;
 		const glm::vec3& getRotation() const;
@@ -53,6 +53,8 @@ namespace waza3d {
 		glm::vec3 m_direction;
 		glm::vec3 m_right;
 		glm::vec3 m_up;
+
+		bool m_update_view_matrix = false;
 
 		static glm::vec3 s_world_up;
 		static glm::vec3 s_world_right;

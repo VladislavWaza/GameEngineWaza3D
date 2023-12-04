@@ -24,71 +24,57 @@ public:
 
 	virtual void onUpdate() override
 	{
-		bool move_camera = false;
 		glm::vec3 movement_delta{ 0, 0, 0 };
 		glm::vec3 rotation_delta{ 0, 0, 0 };
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_W))
 		{
 			movement_delta.z += 0.005f;
-			move_camera = true;
 		}
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_S))
 		{
 			movement_delta.z -= 0.005f;
-			move_camera = true;
 		}
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_D))
 		{
 			movement_delta.y += 0.005f;
-			move_camera = true;
 		}
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_A))
 		{
 			movement_delta.y -= 0.005f;
-			move_camera = true;
 		}
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_E))
 		{
 			movement_delta.x += 0.005f;
-			move_camera = true;
 		}
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_Q))
 		{
 			movement_delta.x -= 0.005f;
-			move_camera = true;
 		}
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_UP))
 		{
 			rotation_delta.y -= 0.5f;
-			move_camera = true;
 		}
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_DOWN))
 		{
 			rotation_delta.y += 0.5f;
-			move_camera = true;
 		}
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_RIGHT))
 		{
 			rotation_delta.z -= 0.5f;
-			move_camera = true;
 		}
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_LEFT))
 		{
 			rotation_delta.z += 0.5f;
-			move_camera = true;
 		}
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_Z))
 		{
 			rotation_delta.x -= 0.5f;
-			move_camera = true;
 		}
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_X))
 		{
 			rotation_delta.x += 0.5f;
-			move_camera = true;
 		}
-		if (move_camera)
-			m_camera->addMovementRotation(movement_delta, rotation_delta);
+		m_camera->addMovementRotation(movement_delta, rotation_delta);
 	}
 
 	virtual void onUIDraw() override
