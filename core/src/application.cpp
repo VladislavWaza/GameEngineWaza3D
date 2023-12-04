@@ -53,6 +53,7 @@ namespace waza3d {
 			}
 		);
 
+		/*Задаем функцию обработки ивента нажатия кнопки извне*/
 		m_event_dispatcher.addEventListener<EventKeyPressed>(
 			[&](EventKeyPressed& e)
 			{
@@ -64,6 +65,7 @@ namespace waza3d {
 			}
 		);
 
+		/*Задаем функцию обработки ивента отжатия кнопки извне*/
 		m_event_dispatcher.addEventListener<EventKeyReleased>(
 			[&](EventKeyReleased& e)
 			{
@@ -74,6 +76,29 @@ namespace waza3d {
 				Input::ReleaseKey(e.m_key_code);
 			}
 		);
+
+		/*Задаем функцию обработки ивента нажатия кнопки мыши извне*/
+		m_event_dispatcher.addEventListener<EventMouseButtonPressed>(
+			[&](EventMouseButtonPressed& e)
+			{
+				LOG_INFO("[MouseButtonPressed] with code {0} by coordinates {1}x{2}", 
+					static_cast<int>(e.m_mouse_button_code), e.m_x, e.m_y);
+				Input::PressMouseButton(e.m_mouse_button_code);
+			}
+		);
+
+		/*Задаем функцию обработки ивента отжатия кнопки мыши извне*/
+		m_event_dispatcher.addEventListener<EventMouseButtonReleased>(
+			[&](EventMouseButtonReleased& e)
+			{
+				LOG_INFO("[MouseButtonReleased] with code {0} by coordinates {1}x{2}",
+					static_cast<int>(e.m_mouse_button_code), e.m_x, e.m_y);
+				Input::ReleaseMouseButton(e.m_mouse_button_code);
+			}
+		);
+
+
+
 
 		/*Эта лямбда будет вызываться каждый раз когда происходит какой-либо ивент*/
 		m_window->setEventCallback(

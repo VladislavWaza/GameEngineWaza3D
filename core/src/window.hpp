@@ -2,6 +2,8 @@
 #include <string>
 #include <functional>
 
+#include <glm/ext/vector_float2.hpp>
+
 struct GLFWwindow;
 
 namespace waza3d {
@@ -26,6 +28,8 @@ namespace waza3d {
 		void onUpdate();
 		unsigned int width() const;
 		unsigned int height() const;
+		glm::vec2 getCursorPos() const;
+
 		void setEventCallback(const EventCallbackFun& callback);
 	private:
 		int init();

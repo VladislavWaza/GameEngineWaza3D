@@ -14,8 +14,8 @@ namespace waza3d {
 		KeyPressed,
 		KeyReleased,
 
-		//MouseButtonPressed,
-		//MouseButtonReleased,
+		MouseButtonPressed,
+		MouseButtonReleased,
 		MouseMoved,
 
 		EventsCount
@@ -127,5 +127,38 @@ namespace waza3d {
 			return m_type;
 		}
 	};
+	
+	/*Нажатие кнопки мыши*/
+	struct EventMouseButtonPressed : public BaseEvent {
+		static const EventType m_type = EventType::MouseButtonPressed;
+		MouseButtonCode m_mouse_button_code;
+		double m_x;
+		double m_y;
 
+
+		EventMouseButtonPressed(const MouseButtonCode mouse_button_code, const double pos_x, const double pos_y)
+			:m_mouse_button_code(mouse_button_code), m_x(pos_x), m_y(pos_y) {}
+
+		virtual EventType getType() const override
+		{
+			return m_type;
+		}
+	};
+
+	/*Отжатие кнопки мыши*/
+	struct EventMouseButtonReleased : public BaseEvent {
+		static const EventType m_type = EventType::MouseButtonReleased;
+		MouseButtonCode m_mouse_button_code;
+		double m_x;
+		double m_y;
+
+
+		EventMouseButtonReleased(const MouseButtonCode mouse_button_code, const double pos_x, const double pos_y)
+			:m_mouse_button_code(mouse_button_code), m_x(pos_x), m_y(pos_y) {}
+
+		virtual EventType getType() const override
+		{
+			return m_type;
+		}
+	};
 }

@@ -36,6 +36,14 @@ namespace waza3d {
 		return m_data.m_height;
 	}
 
+    glm::vec2 Window::getCursorPos() const
+    {
+        double x_pos;
+        double y_pos;
+        glfwGetCursorPos(m_window, &x_pos, &y_pos);
+        return glm::vec2{ x_pos, y_pos };
+    }
+
     void Window::setEventCallback(const EventCallbackFun& callback)
     {
         m_data.m_event_callback_fun = callback;
@@ -77,12 +85,48 @@ namespace waza3d {
         /*Кладем пользовательские данные m_data в GLFW окно m_window*/
         glfwSetWindowUserPointer(m_window, &m_data);
 
+        /*Обработка нажатий мыши*/
+        glfwSetMouseButtonCallback(m_window,
+            [](GLFWwindow* window, int button, int action, int mods)
+            {
+                /*Получаем ссылку на пользовательские данные m_data из GLFW окна m_window*/
+                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 
+                /*Получаем координаты положения мыши*/
+                double x_pos;
+                double y_pos;
+                glfwGetCursorPos(window, &x_pos, &y_pos);
+                //glm::vec2 cursor_pos = getCursorPos();
+
+                /*Вызываем функцию-обработчик заданную извне*/
+                switch (action)
+                {
+                    case GLFW_PRESS:
+                    {
+                        EventMouseButtonPressed event(static_cast<MouseButtonCode>(button), x_pos, y_pos);
+                        data.m_event_callback_fun(event);
+                        break;
+                    }
+                    case GLFW_RELEASE:
+                    {
+                        EventMouseButtonReleased event(static_cast<MouseButtonCode>(button), x_pos, y_pos);
+                        data.m_event_callback_fun(event);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        );
+
+        /*Обработка нажатий клавиш*/
         glfwSetKeyCallback(m_window,
             [](GLFWwindow* window, int key, int scancode, int action, int mods)
             {
+                /*Получаем ссылку на пользовательские данные m_data из GLFW окна m_window*/
                 WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 
+                /*Вызываем функцию-обработчик заданную извне*/
                 switch (action)
                 {
                 case GLFW_PRESS:
