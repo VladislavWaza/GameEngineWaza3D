@@ -8,6 +8,7 @@
 #include "model.hpp"
 #include "object.hpp"
 #include "scene.hpp"
+#include "input.hpp"
 
 #include <imgui/imgui.h>
 
@@ -48,6 +49,22 @@ namespace waza3d {
 			{
 				LOG_INFO("[WindowClose]");
 				m_close_window = true;
+			}
+		);
+
+		m_event_dispatcher.addEventListener<EventKeyPressed>(
+			[&](EventKeyPressed& e)
+			{
+				LOG_INFO("[KeyPressed] {0} with code {1}", static_cast<char>(e.m_key_code), static_cast<int>(e.m_key_code));
+				Input::PressKey(e.m_key_code);
+			}
+		);
+
+		m_event_dispatcher.addEventListener<EventKeyReleased>(
+			[&](EventKeyReleased& e)
+			{
+				LOG_INFO("[KeyReleased] {0} with code {1}", static_cast<char>(e.m_key_code), static_cast<int>(e.m_key_code));
+				Input::ReleaseKey(e.m_key_code);
 			}
 		);
 

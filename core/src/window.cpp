@@ -77,6 +77,38 @@ namespace waza3d {
         /*Кладем пользовательские данные m_data в GLFW окно m_window*/
         glfwSetWindowUserPointer(m_window, &m_data);
 
+
+        glfwSetKeyCallback(m_window,
+            [](GLFWwindow* window, int key, int scancode, int action, int mods)
+            {
+                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+
+                switch (action)
+                {
+                case GLFW_PRESS:
+                {
+                    EventKeyPressed event(static_cast<KeyCode>(key), false);
+                    data.m_event_callback_fun(event);
+                    break;
+                }
+                case GLFW_RELEASE:
+                {
+                    EventKeyReleased event(static_cast<KeyCode>(key));
+                    data.m_event_callback_fun(event);
+                    break;
+                }
+                case GLFW_REPEAT:
+                {
+                    EventKeyPressed event(static_cast<KeyCode>(key), true);
+                    data.m_event_callback_fun(event);
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+        );
+
         /*Эта лямбда-функция будет вызываться каждый раз когда происходит встроенное в GLFW изменение размеров окна*/
         glfwSetWindowSizeCallback(m_window, 
             [](GLFWwindow* window, int width, int height)

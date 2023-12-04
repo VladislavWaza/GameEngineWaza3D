@@ -2,6 +2,8 @@
 #include <array>
 #include <functional>
 
+#include "keys.hpp"
+
 namespace waza3d {
 
 	enum class EventType
@@ -9,8 +11,8 @@ namespace waza3d {
 		WindowResize = 0,
 		WindowClose,
 
-		//KeyPressed,
-		//KeyReleased,
+		KeyPressed,
+		KeyReleased,
 
 		//MouseButtonPressed,
 		//MouseButtonReleased,
@@ -89,6 +91,36 @@ namespace waza3d {
 
 		EventMouseMoved(double new_x, double new_y)
 			:m_x(new_x), m_y(new_y) {}
+
+		virtual EventType getType() const override
+		{
+			return m_type;
+		}
+	};
+
+	/*Нажатие клавиши*/
+	struct EventKeyPressed : public BaseEvent {
+		static const EventType m_type = EventType::KeyPressed;
+		KeyCode m_key_code;
+		bool m_repeat;
+
+
+		EventKeyPressed(const KeyCode key_code, const bool repeat)
+			:m_key_code(key_code), m_repeat(repeat) {}
+
+		virtual EventType getType() const override
+		{
+			return m_type;
+		}
+	};
+
+	/*Отжатие клавиши клавиши*/
+	struct EventKeyReleased : public BaseEvent {
+		static const EventType m_type = EventType::KeyReleased;
+		KeyCode m_key_code;
+
+		EventKeyReleased(const KeyCode key_code)
+			:m_key_code(key_code){}
 
 		virtual EventType getType() const override
 		{

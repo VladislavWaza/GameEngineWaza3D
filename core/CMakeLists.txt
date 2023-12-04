@@ -10,6 +10,8 @@ set(ENGINE_PUBLIC_INCLUDES
 	includes/model.hpp
 	includes/object.hpp
 	includes/scene.hpp
+	includes/keys.hpp
+	includes/input.hpp
 )
 
 set(ENGINE_PRIVATE_INCLUDES
@@ -36,6 +38,7 @@ set(ENGINE_PRIVATE_SOURCES
 	src/model.cpp
 	src/object.cpp
 	src/scene.cpp
+	src/input.cpp
 )
 
 set(ENGINE_ALL_SOURCES
