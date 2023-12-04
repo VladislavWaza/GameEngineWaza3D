@@ -108,8 +108,8 @@ namespace waza3d {
 
 		glm::mat3 rotate_matrixX(
 			1, 0, 0,
-			0, cos(roll_in_radians), sin(roll_in_radians),
-			0, -sin(roll_in_radians), cos(roll_in_radians)
+			0, cos(yaw_in_radians), sin(yaw_in_radians),
+			0, -sin(yaw_in_radians), cos(yaw_in_radians)
 		);
 
 		glm::mat3 rotate_matrixY(
@@ -119,12 +119,12 @@ namespace waza3d {
 		);
 
 		glm::mat3 rotate_matrixZ(
-			1, 0, 0,
-			0, cos(yaw_in_radians), sin(yaw_in_radians),
-			0, -sin(yaw_in_radians), cos(yaw_in_radians)
+			cos(roll_in_radians), sin(roll_in_radians), 0,
+			-sin(roll_in_radians), cos(roll_in_radians), 0,
+			0, 0, 1
 		);
 
-		glm::mat3 euler_matrix = rotate_matrixZ * rotate_matrixY * rotate_matrixX;
+		glm::mat3 euler_matrix = rotate_matrixZ * rotate_matrixX * rotate_matrixY;
 		m_direction = glm::normalize(euler_matrix * s_world_forward);
 		m_right = glm::normalize(euler_matrix * s_world_right);
 		m_up = glm::cross(m_right, m_direction);
