@@ -9,6 +9,7 @@
 #include "object.hpp"
 #include "scene.hpp"
 #include "input.hpp"
+#include "camera.hpp"
 
 #include <imgui/imgui.h>
 
@@ -55,7 +56,10 @@ namespace waza3d {
 		m_event_dispatcher.addEventListener<EventKeyPressed>(
 			[&](EventKeyPressed& e)
 			{
-				LOG_INFO("[KeyPressed] {0} with code {1}", static_cast<char>(e.m_key_code), static_cast<int>(e.m_key_code));
+				if (static_cast<char>(e.m_key_code) <= 'Z' && static_cast<char>(e.m_key_code) >= 'A')
+					LOG_INFO("[KeyPressed] {0} with code {1}", static_cast<char>(e.m_key_code), static_cast<int>(e.m_key_code));
+				else
+					LOG_INFO("[KeyPressed] with code {0}", static_cast<int>(e.m_key_code));
 				Input::PressKey(e.m_key_code);
 			}
 		);
@@ -63,7 +67,10 @@ namespace waza3d {
 		m_event_dispatcher.addEventListener<EventKeyReleased>(
 			[&](EventKeyReleased& e)
 			{
-				LOG_INFO("[KeyReleased] {0} with code {1}", static_cast<char>(e.m_key_code), static_cast<int>(e.m_key_code));
+				if (static_cast<char>(e.m_key_code) <= 'Z' && static_cast<char>(e.m_key_code) >= 'A')
+					LOG_INFO("[KeyReleased] {0} with code {1}", static_cast<char>(e.m_key_code), static_cast<int>(e.m_key_code));
+				else
+					LOG_INFO("[KeyReleased] with code {0}", static_cast<int>(e.m_key_code));
 				Input::ReleaseKey(e.m_key_code);
 			}
 		);
@@ -105,6 +112,9 @@ namespace waza3d {
 			return -1;
 		}
 
+
+		m_camera = std::make_unique<Camera>();
+
 		m_scene = scene;
 
 		/*Создаем Layout буфера, в котором друг за другом идет позиция и цвет*/
@@ -114,10 +124,10 @@ namespace waza3d {
 		};
 
 		Model* model = new Model({
-			0.f, 0.43f, 0.0f,       0.7f, 0.f, 0.f,     //0
-			-0.215f, 0.0f, 0.0f,    0.f, 0.7f, 0.f,     //1
-			0.215f, 0.0f, 0.0f,     0.f, 0.f, 0.7f,     //2
-			0.f, 0.143f, 0.43f,     0.7f, 0.7f, 0.7f,   //3
+			0.f,	0.43f, 0.0f, 	0.7f, 0.f,	 0.f,     //0
+			-0.215f, 0.0f, 0.0f,	0.f, 0.7f,	 0.f,     //1
+			0.215f, 0.0f,  0.0f, 	 0.f, 0.f,	 0.7f,	//2
+			 0.f, 0.143f,  0.43f,	 0.7f, 0.7f, 0.7f,	//3
 			}, {
 				0, 1, 2, 0, 1, 3, 1, 2, 3, 0, 2, 3 //indexes
 			}, buffer_layout_2vec3, VertexBuffer::UsageType::Static, VertexBuffer::UsageType::Static);
@@ -130,6 +140,7 @@ namespace waza3d {
 		float rotate[3] = { 0.f, 0.f, 0.f };
 		float translate[3] = { 0.f, 0.f, 0.f };
 
+		beforeStart();
 		while (!m_close_window)
 		{
 			/*Чистим окно заливая своим цветом*/
@@ -137,6 +148,9 @@ namespace waza3d {
 			Render::clear();
 
 			/*Подключаем программу шейдеров и рисуем cцену*/
+			m_shader_program->bind();
+			m_shader_program->setMatrix4("camera_matrix",
+				m_camera->getProjectionMatrix() * m_camera->getViewMatrix());
 			m_scene->draw(*m_shader_program);
 
 			m_scene->getObject("piramid").setScale(scale[0], scale[1], scale[2]);
@@ -166,15 +180,4 @@ namespace waza3d {
 		m_window = nullptr;
         return 0;
 	}
-
-	void Application::setScene(Scene* scene)
-	{
-		m_scene = scene;
-	}
-
-	Scene* Application::scene()
-	{
-		return m_scene;
-	}
-
 }

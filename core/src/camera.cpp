@@ -1,8 +1,15 @@
 #include "camera.hpp"
 
 #include <glm/trigonometric.hpp>
+#include <glm/ext/matrix_transform.hpp>
 
 namespace waza3d {
+
+	glm::vec3 Camera::s_world_up = glm::vec3(0.f, 0.f, 1.f );
+	glm::vec3 Camera::s_world_right = glm::vec3(0.f, -1.f, 0.f);
+	glm::vec3 Camera::s_world_forward = glm::vec3(1.f, 0.f, 0.f);
+
+
 	Camera::Camera(const glm::vec3& position, const glm::vec3& rotation, const ProjectionMode projection_mode)
 		:m_position(position), m_rotation(rotation), m_projection_mode(projection_mode)
 	{
@@ -29,6 +36,15 @@ namespace waza3d {
 		updateViewMatrix();
 	}
 
+	void Camera::addMovementRotation(const glm::vec3& movement_delta, const glm::vec3& rotation_delta)
+	{
+		m_position += m_direction * movement_delta.x;
+		m_position += m_right * movement_delta.y;
+		m_position += m_up * movement_delta.z;
+		m_rotation += rotation_delta;
+		updateViewMatrix();
+	}
+
 	void Camera::setProjectionMode(const ProjectionMode projection_mode)
 	{
 		m_projection_mode = projection_mode;
@@ -45,38 +61,70 @@ namespace waza3d {
 		return m_projection_matrix;
 	}
 
+	const glm::vec3& Camera::getPosition() const
+	{
+		return m_position;
+	}
+
+	const glm::vec3& Camera::getRotation() const
+	{
+		return m_rotation;
+	}
+
+	const Camera::ProjectionMode Camera::getProjectionMode() const
+	{
+		return m_projection_mode;
+	}
+
+	void Camera::moveForward(const float delta)
+	{
+		m_position += m_direction * delta;
+		updateViewMatrix();
+	}
+
+	void Camera::moveRight(const float delta)
+	{
+		m_position += m_right * delta;
+		updateViewMatrix();
+	}
+
+	void Camera::moveUp(const float delta)
+	{
+		m_position += m_up * delta;
+		updateViewMatrix();
+	}
+
 	void Camera::updateViewMatrix()
 	{
-		glm::mat4 translate_matrix(
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			-m_position[0], -m_position[1], -m_position[2], 1);
+		remainderRotation();
+		float roll_in_radians = glm::radians(m_rotation.x);
+		float pitch_in_radians = glm::radians(m_rotation.y);
+		float yaw_in_radians = glm::radians(m_rotation.z);
 
-		float rir[3] = { glm::radians(-m_rotation.x), glm::radians(-m_rotation.y), glm::radians(-m_rotation.z) }; //rotate_in_radians
-
-		glm::mat4 rotate_matrixX(
-			1, 0, 0, 0,
-			0, cos(rir[0]), -sin(rir[0]), 0,
-			0, sin(rir[0]), cos(rir[0]), 0,
-			0, 0, 0, 1
+		glm::mat3 rotate_matrixX(
+			1, 0, 0,
+			0, cos(roll_in_radians), sin(roll_in_radians),
+			0, -sin(roll_in_radians), cos(roll_in_radians)
 		);
 
-		glm::mat4 rotate_matrixY(
-			cos(rir[1]), 0, sin(rir[1]), 0,
-			0, 1, 0, 0,
-			-sin(rir[1]), 0, cos(rir[1]), 0,
-			0, 0, 0, 1
+		glm::mat3 rotate_matrixY(
+			cos(pitch_in_radians), 0, -sin(pitch_in_radians),
+			0, 1, 0,
+			sin(pitch_in_radians), 0, cos(pitch_in_radians)
 		);
 
-		glm::mat4 rotate_matrixZ(
-			cos(rir[2]), -sin(rir[2]), 0, 0,
-			sin(rir[2]), cos(rir[2]), 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1
+		glm::mat3 rotate_matrixZ(
+			1, 0, 0,
+			0, cos(yaw_in_radians), sin(yaw_in_radians),
+			0, -sin(yaw_in_radians), cos(yaw_in_radians)
 		);
 
-		m_view_matrix = rotate_matrixZ * rotate_matrixY * rotate_matrixX * translate_matrix;
+		glm::mat3 euler_matrix = rotate_matrixZ * rotate_matrixY * rotate_matrixX;
+		m_direction = glm::normalize(euler_matrix * s_world_forward);
+		m_right = glm::normalize(euler_matrix * s_world_right);
+		m_up = glm::cross(m_right, m_direction);
+
+		m_view_matrix = glm::lookAt(m_position, m_position + m_direction, m_up);
 	}
 		
 	void Camera::updateProjectionMatrix()
@@ -109,5 +157,22 @@ namespace waza3d {
 				0, 0, (-f - n) / (f - n), 1
 			);
 		}
+	}
+	void Camera::remainderRotation()
+	{
+		if (m_rotation.x >= 360)
+			m_rotation.x = fmod(m_rotation.x, 360);
+		if (m_rotation.x < 0)
+			m_rotation.x = fmod(m_rotation.x, 360) + 360;
+
+		if (m_rotation.y >= 360)
+			m_rotation.y = fmod(m_rotation.y, 360);
+		if (m_rotation.y < 0)
+			m_rotation.y = fmod(m_rotation.y, 360) + 360;
+
+		if (m_rotation.z >= 360)
+			m_rotation.z = fmod(m_rotation.z, 360);
+		if (m_rotation.z < 0)
+			m_rotation.z = fmod(m_rotation.z, 360) + 360;
 	}
 }
