@@ -96,7 +96,6 @@ namespace waza3d {
                 double x_pos;
                 double y_pos;
                 glfwGetCursorPos(window, &x_pos, &y_pos);
-                //glm::vec2 cursor_pos = getCursorPos();
 
                 /*Вызываем функцию-обработчик заданную извне*/
                 switch (action)

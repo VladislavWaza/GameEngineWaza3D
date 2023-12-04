@@ -84,6 +84,7 @@ namespace waza3d {
 				LOG_INFO("[MouseButtonPressed] with code {0} by coordinates {1}x{2}", 
 					static_cast<int>(e.m_mouse_button_code), e.m_x, e.m_y);
 				Input::PressMouseButton(e.m_mouse_button_code);
+				onMouseButtonEvent(e.m_mouse_button_code, e.m_x, e.m_y, true);
 			}
 		);
 
@@ -94,11 +95,9 @@ namespace waza3d {
 				LOG_INFO("[MouseButtonReleased] with code {0} by coordinates {1}x{2}",
 					static_cast<int>(e.m_mouse_button_code), e.m_x, e.m_y);
 				Input::ReleaseMouseButton(e.m_mouse_button_code);
+				onMouseButtonEvent(e.m_mouse_button_code, e.m_x, e.m_y, false);
 			}
 		);
-
-
-
 
 		/*Эта лямбда будет вызываться каждый раз когда происходит какой-либо ивент*/
 		m_window->setEventCallback(
@@ -204,5 +203,10 @@ namespace waza3d {
 		}
 		m_window = nullptr;
         return 0;
+	}
+
+	glm::vec2 Application::getCursorPos() const
+	{
+		return m_window->getCursorPos();
 	}
 }

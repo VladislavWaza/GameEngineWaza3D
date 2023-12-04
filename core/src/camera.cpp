@@ -99,6 +99,12 @@ namespace waza3d {
 		m_update_view_matrix = true;
 	}
 
+	void Camera::moveWorldUp(const float delta)
+	{
+		m_position += s_world_up * delta;
+		m_update_view_matrix = true;
+	}
+
 	void Camera::updateViewMatrix()
 	{
 		remainderRotation();

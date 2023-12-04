@@ -11,8 +11,11 @@ class Editor : public waza3d::Application
 {
 	int frame = 0;
 	bool m_perspective_camera = true;
-	float m_camera_pos[3];
-	float m_camera_rotation[3];
+	float m_camera_pos[3] = {};
+	float m_camera_rotation[3] = {};
+
+	double m_init_mouse_pos_x = 0.;
+	double m_init_mouse_pos_y = 0.;
 public:
 	virtual void beforeStart() override
 	{
@@ -21,6 +24,12 @@ public:
 			: waza3d::Camera::ProjectionMode::Orthographic);
 	}
 
+	virtual void onMouseButtonEvent(const waza3d::MouseButtonCode mouse_button,
+		const double x, const double y, const bool pressed) override
+	{
+		m_init_mouse_pos_x = x;
+		m_init_mouse_pos_y = y;
+	}
 
 	virtual void onUpdate() override
 	{
@@ -68,12 +77,33 @@ public:
 		}
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_Z))
 		{
-			rotation_delta.x -= 0.5f;
+			rotation_delta.x += 0.5f;
 		}
 		if (waza3d::Input::isKeyPressed(waza3d::KeyCode::KEY_X))
 		{
-			rotation_delta.x += 0.5f;
+			rotation_delta.x -= 0.5f;
 		}
+
+		if (waza3d::Input::isMouseButtonPressed(waza3d::MouseButtonCode::MOUSE_BUTTON_RIGHT))
+		{
+			glm::vec2 cursor_pos = getCursorPos();
+			if (waza3d::Input::isMouseButtonPressed(waza3d::MouseButtonCode::MOUSE_BUTTON_LEFT))
+			{
+				
+				m_camera->moveRight(static_cast<float>(m_init_mouse_pos_x - cursor_pos.x) / 100.f);
+				m_camera->moveWorldUp(static_cast<float>(m_init_mouse_pos_y - cursor_pos.y) / 100.f);
+			}
+			else
+			{
+				rotation_delta.z += static_cast<float>(m_init_mouse_pos_x - cursor_pos.x) / 5.f;
+				rotation_delta.y -= static_cast<float>(m_init_mouse_pos_y - cursor_pos.y) / 5.f;
+			}
+			m_init_mouse_pos_x = cursor_pos.x;
+			m_init_mouse_pos_y = cursor_pos.y;
+		}
+
+
+
 		m_camera->addMovementRotation(movement_delta, rotation_delta);
 	}
 

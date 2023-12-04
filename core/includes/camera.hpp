@@ -32,6 +32,8 @@ namespace waza3d {
 		void moveForward(const	float delta);
 		void moveRight(const float delta);
 		void moveUp(const float delta);
+		/*Движение камеры вдоль мировых осей*/
+		void moveWorldUp(const float delta);
 		/*Устанавливаем режим проекции и обновляем матрицу Projection*/
 		void setProjectionMode(const ProjectionMode projection_mode);
 		/*Возвращает матрицу View*/
